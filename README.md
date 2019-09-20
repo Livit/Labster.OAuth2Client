@@ -51,3 +51,12 @@ and
 `export CPPFLAGS="-I/usr/local/opt/openssl/include"`
 `export LDFLAGS="-L/usr/local/opt/openssl/lib"`
 
+Test use PostgresDb. Install postgres, create db, put its settings into test_settings.py
+If you want, you can set
+`export PGDATA='full-path-to/Labster.oauth2_client/psql_data'`
+init_db
+pg_ctl -D /Users/kry/repos/labster/Labster.oauth2_client/psql_data -l logfile start
+createdb "test_oauth2_client"
+So you can ` psql -U your_shell_user test_oauth2_client`
+
+
