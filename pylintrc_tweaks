@@ -1,0 +1,28 @@
+[MASTER]
+ignore = .git,migrations,node_modules,settings,labsterutils,settings.py,manage.py
+init-hook="from pylint.config import find_pylintrc; import sys; sys.path.insert(0, os.path.dirname(find_pylintrc()))"
+
+[TYPECHECK]
+generated-members =
+    REQUEST,
+    acl_users,
+    aq_parent,
+    objects,
+    DoesNotExist,
+    can_read,
+    can_write,
+    get_url,
+    size,
+    content,
+    status_code,
+    create,
+    build,
+    fields,
+    tag,
+    org,
+    course,
+    category,
+    name,
+    revision,
+    _meta,
+    through,

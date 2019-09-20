@@ -1,4 +1,3 @@
-=====
 Oauth2 client
 =====
 
@@ -10,7 +9,6 @@ Basically it is client to make requests from one service to another.
 
 On the reciever side, there is standard 3rd party oauth2 provider library.
 
-
 Versions
 --------
 This repository supports 2.7 and 3.x versions via compat files.
@@ -21,6 +19,8 @@ License Service and other CoockieCutter template services use python 3.
 
 Quick start
 -----------
+
+0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.oauth2_client.git`
 
 1. Add "oauth2_client" to your INSTALLED_APPS setting like this::
 
