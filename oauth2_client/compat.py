@@ -12,9 +12,8 @@ from django.views.generic import View
 #     from django.contrib.postgres import fields as postgres_fields
 # except ImportError:
 #     postgres_fields = None
-
 try:
     # python 3
-    from mock import patch
-except ImportError:
     from unittest.mock import patch
+except ImportError:
+    from mock import patch

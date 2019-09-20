@@ -6,7 +6,7 @@ import time
 from django.test import TestCase
 from django.utils import timezone
 
-from compat import patch
+from oauth2_client.compat import patch
 from oauth2_client.client import get_client, TIMEOUT_SECONDS
 from oauth2_client.models import AccessToken
 from .factories import AccessTokenFactory, ApplicationFactory

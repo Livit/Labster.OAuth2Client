@@ -20,7 +20,8 @@ settings.configure(
     DEBUG=True,
     DATABASES={
         'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         }
     },
     INSTALLED_APPS=(
