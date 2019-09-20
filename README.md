@@ -57,6 +57,8 @@ If you want, you can set
 init_db
 pg_ctl -D /Users/kry/repos/labster/Labster.oauth2_client/psql_data -l logfile start
 createdb "test_oauth2_client"
-So you can ` psql -U your_shell_user test_oauth2_client`
+(So you can ` psql -U your_shell_user test_oauth2_client`)
+Then fill data in settings file, just change your user name.
+Do not forget to stop pg_ctl when tests ends.
 
 
