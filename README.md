@@ -41,4 +41,13 @@ Quick start
 4. On the client side, put client and secret from receiver side in .env and instantiate client via library calls, and use it for all api calls.
 
 
+Test
+----
+As it is Django app without Django project, custom test runnner created: `test_runnner.py`
+to run tests, install requirements and then `python test_runnner.py`
+Note, to install psycopg2 you need install special packages on Ubuntu and on Mac: http://initd.org/psycopg/docs/install.html
+If for mac you will see `ld: library not found for -lssl`, then ` brew upgrade openssl`
+and
+`export CPPFLAGS="-I/usr/local/opt/openssl/include"`
+`export LDFLAGS="-L/usr/local/opt/openssl/lib"`
 
