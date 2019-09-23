@@ -17,28 +17,6 @@ clean_coverage:
 		coverage erase; \
 		rm -rf ${REPORT_DIR}/diff_coverage/diff_coverage_combined.html
 
-coverage: ## Invoke coverage, only works in TOX!.
-coverage: clean_coverage
-		coverage run test_runner.py \
-			--rcfile=.coveragerc \
-			test_runnner.py
-
-coverage_report: ## Invoke coverage report.
-coverage_report:
-		coverage combine \
-			--rcfile=.coveragerc
-		coverage xml \
-			--rcfile=.coveragerc
-		coverage html \
-			--rcfile=.coveragerc
-		coverage report
-
-diff_coverage: ## Invoke diff-cover.
-diff_coverage:
-		mkdir -p ${REPORT_DIR}/diff_coverage diff-cover \
-			${REPORT_DIR}/coverage.xml \
-			--html-report ${REPORT_DIR}/diff_coverage/diff_coverage_combined.html
-
 pycodestyle: ## Invoke "make pycodestyle".
 pycodestyle:
 		mkdir -p ${REPORT_DIR} && pycodestyle ${APPS} $(arg) | tee ${REPORT_DIR}/pycodestyle.report

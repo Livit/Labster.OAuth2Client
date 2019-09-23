@@ -11,6 +11,7 @@ omit =
     *config/wsgi.py
     *manage.py
     *labsterutils/*
+    *tox/*
 
 concurrency=multiprocessing
 

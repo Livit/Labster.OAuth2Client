@@ -4,3 +4,4 @@
 /psql_data/
 .tox
 /reports/
+.coverage
