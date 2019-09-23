@@ -1,0 +1,202 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  disable: true
+
+steps:
+- name: git
+  pull: default
+  image: plugins/git
+  settings:
+    recursive: true
+    submodule_override:
+      labsterutils: https://github.com/Livit/Livit.Learn.Utils.git
+    tags: true
+
+- name: slack_intro
+  pull: default
+  image: plugins/slack
+  settings:
+    template: |+
+      Drone reports about ${DRONE_REPO_NAME},
+      changes in ${DRONE_BRANCH} by ${DRONE_COMMIT_AUTHOR}.
+      ```${DRONE_COMMIT_MESSAGE}```
+      Build ${DRONE_BUILD_NUMBER} started.
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+
+- name: prepare
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - apk --update add bash git
+  - scripts/cicd/semver.sh | tee .tags
+  - scripts/cicd/helm.sh ls
+  - scripts/cicd/slack.sh
+  when:
+    event:
+    - push
+    - tag
+
+- name: test
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - apk --update add bash
+  - scripts/cicd/build.sh
+  - scripts/cicd/test.sh
+  environment:
+    AWS_ACCOUNT_ID:
+      from_secret: aws_account_id
+    ECR_REGION:
+      from_secret: ecr_region
+    ECR_REPO:
+      from_secret: ecr_repo
+    GITHUB_TOKEN:
+      from_secret: github_token
+  when:
+    event:
+    - push
+
+- name: slack
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - apk --update add bash git
+  - scripts/cicd/slack.sh
+  when:
+    status:
+    - failure
+
+- name: upload
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - apk --update add bash curl
+  - scripts/cicd/upload.sh reports
+  environment:
+    ARTIFACTS_SERVER:
+      from_secret: artifacts_server
+    ECR_ACCESS_KEY:
+      from_secret: ecr_access_key
+    ECR_SECRET_KEY:
+      from_secret: ecr_secret_key
+    GITHUB_TOKEN:
+      from_secret: github_token
+    S3_BUCKET:
+      from_secret: s3_bucket
+  when:
+    event:
+    - push
+    status:
+    - success
+    - failure
+
+- name: sentry
+  pull: default
+  image: getsentry/sentry-cli:1.41.2
+  commands:
+  - apk --update add bash
+  - VERSION=$(cat .tags)
+  - "scripts/cicd/sentry.sh ls $${VERSION}"
+  environment:
+    SENTRY_AUTH_TOKEN:
+      from_secret: sentry_auth_token
+    SENTRY_ORG:
+      from_secret: sentry_org
+    SENTRY_PROJECT:
+      from_secret: sentry_project
+    SENTRY_URL:
+      from_secret: sentry_url
+  when:
+    event:
+    - push
+    - tag
+
+- name: image
+  pull: default
+  image: plugins/ecr
+  settings:
+    dockerfile: Dockerfile.prod
+  environment:
+    AWS_ACCOUNT_ID:
+      from_secret: aws_account_id
+    ECR_ACCESS_KEY:
+      from_secret: ecr_access_key
+    ECR_REGION:
+      from_secret: ecr_region
+    ECR_SECRET_KEY:
+      from_secret: ecr_secret_key
+    PLUGIN_REPO:
+      from_secret: ecr_repo
+  when:
+    event:
+    - push
+    - tag
+
+- name: chart
+  pull: default
+  image: labsterdevops/drone-chartmuseum:2019011700
+  settings:
+    charts_dir: .helm
+  environment:
+    PLUGIN_HELM_REPO:
+      from_secret: helm_repo
+  when:
+    event:
+    - push
+    - tag
+
+- name: deploy
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - VERSION=$(cat .tags)
+  - "scripts/cicd/deploy.sh ls staging $${VERSION}"
+  environment:
+    ANSIBLE_TOKEN:
+      from_secret: ansible_token
+    ANSIBLE_URL:
+      from_secret: ansible_url
+  when:
+    event:
+    - tag
+
+- name: slack_report
+  pull: default
+  image: plugins/slack
+  settings:
+    template: file:///drone/src/slack.txt
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - success
+    - failure
+
+services:
+- name: postgres
+  pull: default
+  image: bitnami/postgresql:10.6.0
+  environment:
+    POSTGRES_DB: test
+    POSTGRES_USER: postgres
+  when:
+    event:
+    - push
+...

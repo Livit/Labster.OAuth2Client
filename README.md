@@ -77,5 +77,6 @@ and `export CPPFLAGS="-I/usr/local/opt/openssl/include"`, `export LDFLAGS="-L/us
 1. Do not run tox from virtualenv
 2. If tox does not gets your code, delete ./.tox folder and sometimes .egg-info folder.
 
-
+#### Coverage
+If coverage is installed globally, it can take wrong version inside virtualenv, so better uninstall it.
 
