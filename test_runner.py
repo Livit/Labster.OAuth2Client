@@ -11,7 +11,7 @@ We have services with different versions of Python:
 Python 2.7 for Simlic and Python3 for License Service.
 We have wrapper in `compat.py` that allows module to work in given python versions,
 """
-import django, sys
+import django, sys, os
 
 from django.conf import settings
 
@@ -22,11 +22,11 @@ settings.configure(
     DATABASES={
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'test_oauth2_client',
-            'USER': 'kry',
-            'PASSWORD': '',
-            'HOST': 'localhost',
-            'POST': '5435'
+            'NAME':  os.environ['POSTGRES_DB'],
+            'USER': os.environ['POSTGRES_USER'],
+            'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+            'HOST': os.environ['POSTGRES_HOST'],
+            'POST': os.environ.get('POSTGRES_PORT', '5432')
         }
     },
     INSTALLED_APPS=(
