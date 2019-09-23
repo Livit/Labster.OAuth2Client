@@ -8,6 +8,7 @@ export POSTGRES_DB=test
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=""
 export POSTGRES_HOST=postgres
+export POSTGRES_PORT=5435
 
 TMPFILE=/tmp/file
 

@@ -41,9 +41,10 @@ Quick start
 Test
 ----
 
-1. pip install tox
-1. run postgres
-2. tox
+- pip install tox
+- run postgres
+- source .env
+- tox
 
 ### More info
 As it is Django app without Django project, custom test runnner created: `test_runnner.py`
