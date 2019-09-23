@@ -11,33 +11,31 @@ help: ## display this help message
 	@perl -nle'print $& if m{^[0-9a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | \
 	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m  %-25s\033[0m %s\n", $$1, $$2}'
 
-
 clean_coverage: ## Clean coverage reports.
 clean_coverage:
 		mkdir -p ${REPORT_DIR} && \
-		./scripts/docker/docker-compose exec license coverage erase; \
+		coverage erase; \
 		rm -rf ${REPORT_DIR}/diff_coverage/diff_coverage_combined.html
 
-coverage: ## Invoke coverage on region.
+coverage: ## Invoke coverage, only works in TOX!.
 coverage: clean_coverage
-		./scripts/docker/docker-compose exec license python3 -m coverage \
-			run --rcfile=.coveragerc \
-			./manage.py test --settings=config.settings.test
+		coverage run test_runner.py \
+			--rcfile=.coveragerc \
+			test_runnner.py
 
 coverage_report: ## Invoke coverage report.
 coverage_report:
-		./scripts/docker/docker-compose exec license coverage combine \
+		coverage combine \
 			--rcfile=.coveragerc
-		./scripts/docker/docker-compose exec license coverage xml \
+		coverage xml \
 			--rcfile=.coveragerc
-		./scripts/docker/docker-compose exec license coverage html \
+		coverage html \
 			--rcfile=.coveragerc
-		./scripts/docker/docker-compose exec license coverage report
+		coverage report
 
-diff_coverage: ## Invoke diff-cover on license.
+diff_coverage: ## Invoke diff-cover.
 diff_coverage:
-		mkdir -p ${REPORT_DIR}/diff_coverage
-		./scripts/docker/docker-compose exec license diff-cover \
+		mkdir -p ${REPORT_DIR}/diff_coverage diff-cover \
 			${REPORT_DIR}/coverage.xml \
 			--html-report ${REPORT_DIR}/diff_coverage/diff_coverage_combined.html
 
@@ -45,7 +43,7 @@ pycodestyle: ## Invoke "make pycodestyle".
 pycodestyle:
 		mkdir -p ${REPORT_DIR} && pycodestyle ${APPS} $(arg) | tee ${REPORT_DIR}/pycodestyle.report
 
-pylint: ## Invoke "make pylint" on license.
+pylint: ## Invoke "make pylint"
 pylint:
 		mkdir -p ${REPORT_DIR} | pylint ${APPS} -j 0 \
 			--rcfile=./pylintrc --msg-template=${MSG_TEMPLATE} $(arg) |\

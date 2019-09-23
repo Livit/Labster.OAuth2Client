@@ -51,6 +51,10 @@ Without tox, to run tests, install requirements from needed python version (see 
 
 Tests use PostgresDb. Install postgres, create db, put its settings into test_runnner.py
 
+#### Codestyle
+
+Tox runs pycodestyle, but not pylint, because pylint checks for django dependecies, which are not part of this project.
+
 ### Nuances
 
 #### PostgreSQL

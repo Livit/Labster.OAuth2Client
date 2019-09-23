@@ -1,0 +1,31 @@
+[run]
+data_file = reports/.coverage
+omit =
+    *venv*
+    *env*
+    *virtualenvs*
+    *migrations*
+    *tests*
+    *admin.py
+    *config/settings/*
+    *config/wsgi.py
+    *manage.py
+    *labsterutils/*
+
+concurrency=multiprocessing
+
+[report]
+ignore_errors = True
+
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    def __str__
+    def __repr__
+
+[html]
+title = Python Test Coverage Report
+directory = reports/coverage
+
+[xml]
+output = reports/coverage.xml

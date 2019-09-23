@@ -2,3 +2,5 @@ tox==3.14.0
 pycodestyle=2.5.0
 pylint=1.9.5
 edx_lint=1.3.0
+diff-cover=2.3.0
+
