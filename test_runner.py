@@ -36,7 +36,7 @@ settings.configure(
         'oauth2_client',
     )
 )
-# import ipdb; ipdb.set_trace()
+
 try:
     # Django < 1.8
     from django.test.simple import DjangoTestSuiteRunner

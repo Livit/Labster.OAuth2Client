@@ -12,3 +12,10 @@ try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
+
+
+try:
+    # python 3
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin

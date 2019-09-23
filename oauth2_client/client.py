@@ -2,11 +2,11 @@
 Service to service call with OAuth2 authentication.
 """
 import time
-from urlparse import urljoin
 
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import BackendApplicationClient
 
+from oauth2_client.compat import urljoin
 from .models import AccessToken, Application
 
 
