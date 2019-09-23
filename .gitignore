@@ -2,3 +2,4 @@
 /dist/
 /*.egg-info/
 /psql_data/
+.tox

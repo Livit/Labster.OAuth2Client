@@ -1,5 +1,0 @@
-mock
-requiests_oauthlib
-django>=1.8
-psycopg2
-factory_boy
