@@ -47,8 +47,7 @@ pycodestyle:
 
 pylint: ## Invoke "make pylint" on license.
 pylint:
-		mkdir -p ${REPORT_DIR} | \
-		./scripts/docker/docker-compose exec -T license pylint ${APPS} -j 0 \
+		mkdir -p ${REPORT_DIR} | pylint ${APPS} -j 0 \
 			--rcfile=./pylintrc --msg-template=${MSG_TEMPLATE} $(arg) |\
 			tee ${REPORT_DIR}/pylint.report
 
