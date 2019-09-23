@@ -41,6 +41,14 @@ Quick start
 Test
 ----
 
+Create env file with following data:
+POSTGRES_DB=fill_value
+POSTGRES_USER=file_value
+POSTGRES_PASSWORD=fill_vale
+POSTGRES_HOST=fill
+POSTGRES_PORT=5435
+
+
 - pip install tox
 - run postgres
 - source .env
