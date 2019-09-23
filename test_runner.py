@@ -33,11 +33,10 @@ settings.configure(
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.admin',
         'oauth2_client',
     )
 )
-
+# import ipdb; ipdb.set_trace()
 try:
     # Django < 1.8
     from django.test.simple import DjangoTestSuiteRunner

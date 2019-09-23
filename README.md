@@ -43,6 +43,7 @@ Quick start
 
 Test
 ----
+Inspiration: https://stackoverflow.com/questions/3841725/how-to-launch-tests-for-django-reusable-app
 As it is Django app without Django project, custom test runnner created: `test_runnner.py`
 to run tests, install requirements and then `python test_runnner.py`
 Note, to install psycopg2 you need install special packages on Ubuntu and on Mac: http://initd.org/psycopg/docs/install.html
@@ -61,4 +62,11 @@ createdb "test_oauth2_client"
 Then fill data in settings file, just change your user name.
 Do not forget to stop pg_ctl when tests ends.
 
+
+
+
+Using tox:
+==========
+1. Probably do not run tox from virtualenv
+2. If tox does not gets your code, delete ./.tox folder
 
