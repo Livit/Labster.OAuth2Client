@@ -14,18 +14,60 @@ steps:
   pull: default
   image: plugins/git
   settings:
-    recursive: true
-    submodule_override:
-      labsterutils: https://github.com/Livit/Livit.Learn.Utils.git
+    recursive: false
     tags: true
 
 
-- name: test
+- name: clone
   pull: default
   image: python:3.7.3-alpine3.8
   commands:
-  - apk --update add bash curl git
-  - scripts/cicd/test.sh
+  - apk --update add openssh-client git
+  # write the ssh key to disk
+  - mkdir /root/.ssh
+  - echo -n "$SSH_KEY" > /root/.ssh/id_rsa
+  - chmod 600 /root/.ssh/id_rsa
+  # add github to known hosts
+  - touch /root/.ssh/known_hosts
+  - chmod 600 /root/.ssh/known_hosts
+  - ssh-keyscan github.com > ~/.ssh/known_hosts 2> /dev/null
+  # pull the git submodules
+  - git submodule update --init
+  - git submodule update --init --recursive
+  # workaround for diff-cover
+  - git fetch origin master:refs/remotes/origin/master
+  environment:
+    SSH_KEY:
+      from_secret: deploy_key
+  when:
+    event:
+    - push
+
+
+- name: py27-django111 test
+  pull: default
+  image: python:2.7.16-alpine3.8
+  commands:
+  - apk --update add bash
+  - scripts/cicd/build.sh
+  - pip install -r requirements.txt
+  - scripts/cicd/test.sh py27-django111
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+  when:
+    event:
+    - push
+
+
+- name: py37-django22 test
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - apk --update add bash
+  - scripts/cicd/build.sh
+  - pip install -r requirements.txt
+  - scripts/cicd/test.sh py37-django22
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
@@ -39,14 +81,15 @@ steps:
   image: python:3.7.3-alpine3.8
   commands:
   - apk --update add bash curl
-  - scripts/cicd/upload.sh reports
+  - scripts/cicd/pre-upload.sh py27-django111
+  - scripts/cicd/pre-upload.sh py37-django22
   environment:
     ARTIFACTS_SERVER:
       from_secret: artifacts_server
-    ECR_ACCESS_KEY:
-      from_secret: ecr_access_key
-    ECR_SECRET_KEY:
-      from_secret: ecr_secret_key
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_key
     GITHUB_TOKEN:
       from_secret: github_token
     S3_BUCKET:
