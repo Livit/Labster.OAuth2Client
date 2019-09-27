@@ -3,6 +3,6 @@ Support for python 2.7 and 3.x
 """
 try:
     # python 3
-    from urllib.parse import urljoin
+    from unittest.mock import patch
 except ImportError:
-    from urlparse import urljoin
+    from mock import patch

@@ -15,7 +15,7 @@ Python and Django compatibility is maintained in `compat.py` and `test_runner.py
 Quick start
 -----------
 
-0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.oauth2_client.git`
+0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.OAuth2Client.git`
 
 1. Add "oauth2_client" to your INSTALLED_APPS setting like this::
 
@@ -88,4 +88,3 @@ and `export CPPFLAGS="-I/usr/local/opt/openssl/include"`, `export LDFLAGS="-L/us
 
 #### Coverage
 If coverage is installed globally, it can take wrong version inside virtualenv, so better uninstall it.
-
