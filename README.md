@@ -2,13 +2,12 @@ What is it
 =====
 
 It is a Django app for service-to-service communication, a client to make requests from one service to another.
-There is proper wiki page in Service-Ready setup project explaining idea behind it.
 On the receiver side, there is standard 3rd party oauth2_provider library.
 
 Versions
 --------
-Python 2.7 and Django 1.11, SimLic and region service use python 2.7
-Python 3.7 and Django 2.2, License Service and other CoockieCutter template services use python 3.
+Python 2.7 and Django 1.11,
+Python 3.7 and Django 2.2
 
 Python and Django compatibility is maintained in `compat.py` and `test_runner.py`
 
@@ -24,7 +23,7 @@ Quick start
         'oauth2_client',
     ]
 
-2. Run `make simlic_manage migrate` to create the oauth2_client models.
+2. Run migrate to create the oauth2_client models.
 
 3. On the receiver side, create Application model and fill with proper data:
 

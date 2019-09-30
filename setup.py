@@ -10,11 +10,15 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
+with open('development.txt') as f:
+    dev_requirements = f.read().splitlines()
+
 setup(
     name='oauth2-client',
     version='0.1.3',
     packages=find_packages(),
     install_requires=requirements,
+    tests_requires=dev_requirements,
     include_package_data=True,
     license='MIT License',
     description='OAuth2 Client for service to service communications',

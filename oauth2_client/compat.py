@@ -6,9 +6,3 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-
-try:
-    # python 3
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
