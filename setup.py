@@ -7,25 +7,17 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
-
-with open('development.txt') as f:
-    dev_requirements = f.read().splitlines()
-
 setup(
     name='oauth2-client',
-    version='0.1.3',
+    version='0.1.6',
     packages=find_packages(),
-    install_requires=requirements,
-    tests_require=dev_requirements,
     include_package_data=True,
     license='MIT License',
     description='OAuth2 Client for service to service communications',
     long_description=README,
     url='https://github.com/Livit/Labster.OAuth2Client',
     author='Labster',
-    author_email='yourname@example.com',
+    author_email='alexander@labster.',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
