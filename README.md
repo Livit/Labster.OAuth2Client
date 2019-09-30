@@ -1,13 +1,13 @@
 What is it
 =====
 
-It is a Django app for service-to-service communcation, a client to make requests from one service to another.
+It is a Django app for service-to-service communication, a client to make requests from one service to another.
 There is proper wiki page in Service-Ready setup project explaining idea behind it.
-On the reciever side, there is standard 3rd party oauth2_provider library.
+On the receiver side, there is standard 3rd party oauth2_provider library.
 
 Versions
 --------
-Python 2.7 and Django 1.11.17, Simlic and region service use python 2.7
+Python 2.7 and Django 1.11, SimLic and region service use python 2.7
 Python 3.7 and Django 2.2, License Service and other CoockieCutter template services use python 3.
 
 Python and Django compatibility is maintained in `compat.py` and `test_runner.py`
@@ -15,7 +15,7 @@ Python and Django compatibility is maintained in `compat.py` and `test_runner.py
 Quick start
 -----------
 
-0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.OAuth2Client.git`
+0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.1.3`
 
 1. Add "oauth2_client" to your INSTALLED_APPS setting like this::
 
