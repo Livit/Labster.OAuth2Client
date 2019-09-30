@@ -1,3 +1,5 @@
+[![Build Status](https://drone.labster.com/api/badges/Livit/Labster.OAuth2Client/status.svg)](https://drone.labster.com/Livit/Labster.OAuth2Client)
+
 What is it
 =====
 
