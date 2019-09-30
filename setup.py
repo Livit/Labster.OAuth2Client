@@ -18,7 +18,7 @@ setup(
     version='0.1.3',
     packages=find_packages(),
     install_requires=requirements,
-    tests_requires=dev_requirements,
+    tests_require=dev_requirements,
     include_package_data=True,
     license='MIT License',
     description='OAuth2 Client for service to service communications',
