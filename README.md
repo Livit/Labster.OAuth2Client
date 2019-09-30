@@ -62,7 +62,7 @@ Tests use PostgresDb. Install postgres, create db, put its settings into test_ru
 
 #### Codestyle
 
-Tox runs pycodestyle, but not pylint, because pylint checks for django dependecies, which are not part of this project.
+Tox runs pycodestyle, but not pylint, because pylint checks for Django dependencies, which are not part of this project.
 
 ### Nuances
 
