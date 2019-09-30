@@ -1,21 +1,22 @@
+[![Build Status](https://drone.labster.com/api/badges/Livit/Labster.OAuth2Client/status.svg)](https://drone.labster.com/Livit/Labster.OAuth2Client)
+
 What is it
 =====
 
-It is a Django app for service-to-service communcation, a client to make requests from one service to another.
-There is proper wiki page in Service-Ready setup project explaining idea behind it.
-On the reciever side, there is standard 3rd party oauth2_provider library.
+It is a Django app for service-to-service communication, a client to make requests from one service to another.
+On the receiver side, there is standard 3rd party oauth2_provider library.
 
 Versions
 --------
-Python 2.7 and Django 1.11.17, Simlic and region service use python 2.7
-Python 3.7 and Django 2.2, License Service and other CoockieCutter template services use python 3.
+Python 2.7 and Django 1.11,
+Python 3.7 and Django 2.2
 
 Python and Django compatibility is maintained in `compat.py` and `test_runner.py`
 
 Quick start
 -----------
 
-0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.OAuth2Client.git`
+0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.1.3`
 
 1. Add "oauth2_client" to your INSTALLED_APPS setting like this::
 
@@ -24,7 +25,7 @@ Quick start
         'oauth2_client',
     ]
 
-2. Run `make simlic_manage migrate` to create the oauth2_client models.
+2. Run migrate to create the oauth2_client models.
 
 3. On the receiver side, create Application model and fill with proper data:
 
@@ -62,7 +63,7 @@ Tests use PostgresDb. Install postgres, create db, put its settings into test_ru
 
 #### Codestyle
 
-Tox runs pycodestyle, but not pylint, because pylint checks for django dependecies, which are not part of this project.
+Tox runs pycodestyle, but not pylint, because pylint checks for Django dependencies, which are not part of this project.
 
 ### Nuances
 

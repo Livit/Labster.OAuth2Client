@@ -9,21 +9,21 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='oauth2-client',
-    version='0.1',
+    version='0.1.2',
     packages=find_packages(),
     include_package_data=True,
-    license='BSD License',  # TODO which license to use
-    description='OAuth2 client for service to service communications',
+    license='MIT License',
+    description='OAuth2 Client for service to service communications',
     long_description=README,
-    url='https://www.example.com/',
+    url='https://github.com/Livit/Labster.OAuth2Client',
     author='Labster',
-    author_email='yourname@example.com',
+    author_email='alexander@labster.com',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: X.Y',  # replace "X.Y" as appropriate
+        'Framework :: Django :: 1.8-2.2',  # replace "X.Y" as appropriate
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',  # example license
+        'License :: OSI Approved :: MIT License',  # example license
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',

@@ -1,6 +1,6 @@
 mock==3.0.5
 requests_oauthlib==1.2.0
-django==1.11.25
+django==1.11.24
 psycopg2==2.8.3
 factory_boy==2.12.0
 pycodestyle==2.5.0
