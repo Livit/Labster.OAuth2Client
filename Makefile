@@ -11,6 +11,11 @@ help: ## display this help message
 	@perl -nle'print $& if m{^[0-9a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | \
 	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m  %-25s\033[0m %s\n", $$1, $$2}'
 
+setup: ## Setup local dev env.
+setup:
+		virtualenv -p python3 .env && . .env/bin/activate && \
+	  pip install -r development.txt
+
 clean_coverage: ## Clean coverage reports.
 clean_coverage:
 		mkdir -p ${REPORT_DIR} && \
@@ -32,3 +37,8 @@ quality: pylint pycodestyle
 
 test: ## Run unit tests.
 		tox
+
+trufflehog: ## Run trufflehog secret leaks tool
+trufflehog:
+		./.env/bin/trufflehog --exclude_paths trufflehog-exclude.txt --regex . && \
+		echo "All good"

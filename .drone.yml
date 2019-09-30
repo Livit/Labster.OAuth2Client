@@ -75,6 +75,16 @@ steps:
     event:
     - push
 
+- name: secrets leaks test
+  pull: default
+  image: python:3.7.3-alpine3.8
+  commands:
+  - apk --update add bash git
+  - pip install -r development.txt
+  - trufflehog --exclude_paths trufflehog-exclude.txt --regex .
+  when:
+    event:
+    - push
 
 - name: upload
   pull: default
