@@ -13,7 +13,7 @@ class Application(models.Model):
     name = models.CharField(max_length=50, help_text="Example: licence")
     # base definitions copied from oauth2_provider.Application
     client_id = models.CharField(max_length=100)
-    client_secret = models.CharField(max_length=255)
+    client_secret = models.CharField(max_length=100)
     # URLField isn't used because it doesn't accept docker-to-docker domains
     service_host = models.CharField(
         max_length=200,
