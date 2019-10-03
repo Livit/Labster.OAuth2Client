@@ -89,3 +89,6 @@ and `export CPPFLAGS="-I/usr/local/opt/openssl/include"`, `export LDFLAGS="-L/us
 
 #### Coverage
 If coverage is installed globally, it can take wrong version inside virtualenv, so better uninstall it.
+
+### Migrations
+To create migrations run ```python make_migrations.py```
