@@ -3,16 +3,13 @@ Client tests.
 """
 import time
 
-from django.test import TestCase
 from django.utils import timezone
 
-from oauth2_client.client import get_client, TIMEOUT_SECONDS
-from oauth2_client.models import AccessToken
+from test_case import StandaloneAppTestCase
 from .test_compat import patch
-from .factories import AccessTokenFactory, ApplicationFactory
 
 
-class CreateAccessTokenTest(TestCase):
+class CreateAccessTokenTest(StandaloneAppTestCase):
     """
     Ouath2 client test cases.
     """
@@ -22,6 +19,10 @@ class CreateAccessTokenTest(TestCase):
         """
         Ensure new token is created if there is no token.
         """
+        from oauth2_client.models import AccessToken
+        from oauth2_client.client import get_client
+        from .factories import ApplicationFactory
+
         app = ApplicationFactory()
         token = {'access_token': 'my_token', 'expires_at': time.time()}
         get_token_mock.return_value = token
@@ -37,6 +38,10 @@ class CreateAccessTokenTest(TestCase):
         """
         Ensure no token is created if there is no expired one.
         """
+        from oauth2_client.models import AccessToken
+        from oauth2_client.client import get_client, TIMEOUT_SECONDS
+        from .factories import AccessTokenFactory, ApplicationFactory
+
         app = ApplicationFactory()
         token = {'access_token': 'my_token', 'expires_at': time.time() + TIMEOUT_SECONDS + 1}
         access_token = AccessTokenFactory(token=token, application=app)
@@ -51,6 +56,11 @@ class CreateAccessTokenTest(TestCase):
         """
         Ensure new token is created if there is expired one.
         """
+        from oauth2_client.models import AccessToken
+        from oauth2_client.client import get_client
+        from .factories import ApplicationFactory, AccessTokenFactory
+        from oauth2_client.client import TIMEOUT_SECONDS
+
         app = ApplicationFactory()
         curr_token = {'access_token': 'curr_token', 'expires_at': time.time() + TIMEOUT_SECONDS - 1}
         AccessTokenFactory(
