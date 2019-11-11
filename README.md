@@ -41,17 +41,17 @@ Quick start
 
 Test
 ----
-
-Create env file with following data:
-POSTGRES_DB=fill_value
-POSTGRES_USER=file_value
-POSTGRES_PASSWORD=fill_vale
-POSTGRES_HOST=fill
-POSTGRES_PORT=5435
-
+- Create .env file with following data (feel free to change as rquired):
+```shell script
+export POSTGRES_DB=test
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=testPass
+export POSTGRES_HOST=localhost
+export POSTGRES_PORT=5435
+```
 
 - pip install tox
-- run postgres
+- get your test postgres instnce running, see points below
 - source .env
 - tox
 
@@ -68,12 +68,17 @@ Tox runs pycodestyle, but not pylint, because pylint checks for Django dependenc
 ### Nuances
 
 #### PostgreSQL
+
+##### Dockerized PosgreSQL setup
+1. remember to fill out your .env file
+3. run `./test_run_postgres.sh`
+
+##### Quick standalone PostreSQL setup
 To install `psycopg2` you need install special packages on Ubuntu and on Mac: http://initd.org/psycopg/docs/install.html
 
 If on mac you will see `ld: library not found for -lssl`, then `brew upgrade openssl`
 and `export CPPFLAGS="-I/usr/local/opt/openssl/include"`, `export LDFLAGS="-L/usr/local/opt/openssl/lib"`.
 
-##### Quick PostreSQL setup
 1. You can set `export PGDATA='full-path-to/Labster.oauth2_client/psql_data'`
 2. init_db
 3. pg_ctl -D /Users/kry/repos/labster/Labster.oauth2_client/psql_data -l logfile start
