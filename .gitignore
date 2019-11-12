@@ -6,4 +6,5 @@
 /reports/
 .coverage
 .env
+.docker_env
 .eggs/

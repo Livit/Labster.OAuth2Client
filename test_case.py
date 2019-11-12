@@ -11,7 +11,7 @@ def setup_django():
         settings.configure(**TEST_SETTINGS)
         # https://docs.djangoproject.com/en/1.11/topics/settings/#calling-django-setup-is-required-for-standalone-django-usage
         django.setup()
-        # applying migrations manually is needed only for running from within GUI
+        # applying migrations manually is needed only for running from within IDE
         call_command('migrate')
     else:
         # this is the case when the tests are running in a context of some external django application, everything

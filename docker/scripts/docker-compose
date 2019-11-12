@@ -1,0 +1,24 @@
+#!/bin/bash
+
+source .docker_env/bin/activate
+
+source_it() {
+  while read -r line; do
+    if [[ -n "$line" ]] && [[ $line != \#* ]]; then
+      export "$line"
+    fi
+  done < $1
+}
+
+source_it "./docker/settings/services.env"
+source_it "./docker/settings/versions.env"
+source_it "./.env"
+
+export USER_UID=$(id -u)
+export USER_GID=$(id -g)
+if [[ ( "$USER_GID" < 1000 ) ]] ; then
+    export USER_GID=1000
+fi
+export GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
+
+docker-compose "$@"

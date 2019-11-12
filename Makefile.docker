@@ -1,0 +1,25 @@
+.PHONY: restart d_setup logs start status stop
+
+restart: ## stop && start
+restart: stop start
+
+d_setup: ## Setup local dev env for docker-compose.
+d_setup:
+		virtualenv .docker_env && ./.docker_env/bin/pip install -r requirements/docker.txt
+		touch .env
+
+logs: ## Show logs from all running containers
+logs:
+		docker/scripts/docker-compose logs
+
+start: ## Start all containers.
+start:
+		docker/scripts/docker-compose up -d --remove-orphans
+
+status: ## Show containers status.
+status:
+		docker/scripts/docker-compose ps
+
+stop: ## Stop all containers.
+stop:
+		docker/scripts/docker-compose down

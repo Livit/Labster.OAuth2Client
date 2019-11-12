@@ -41,19 +41,11 @@ Quick start
 
 Test
 ----
-- Create .env file with following data (feel free to change as rquired):
-```shell script
-export POSTGRES_DB=test
-export POSTGRES_USER=postgres
-export POSTGRES_PASSWORD=testPass
-export POSTGRES_HOST=localhost
-export POSTGRES_PORT=5435
-```
 
-- pip install tox
+- `pip install tox`
 - get your test postgres instnce running, see points below
-- source .env
-- tox
+- (optional, if you want custom settings) export variables for tox
+- `tox`
 
 ### More info
 As it is Django app without Django project, custom test runnner created: `test_runnner.py`
@@ -70,8 +62,8 @@ Tox runs pycodestyle, but not pylint, because pylint checks for Django dependenc
 #### PostgreSQL
 
 ##### Dockerized PosgreSQL setup
-1. remember to fill out your .env file
-3. run `./test_run_postgres.sh`
+1. `make d_setup`
+2. `make start`
 
 ##### Quick standalone PostreSQL setup
 To install `psycopg2` you need install special packages on Ubuntu and on Mac: http://initd.org/psycopg/docs/install.html
