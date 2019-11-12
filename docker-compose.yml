@@ -1,0 +1,16 @@
+version: '3'
+services:
+#
+# test-postgres
+#
+  test-postgres:
+    image: postgres:${POSTGRES_VERSION}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    env_file:
+      - ./docker/settings/services.env
+      - ./.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

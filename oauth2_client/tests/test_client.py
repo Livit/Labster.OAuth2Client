@@ -12,6 +12,9 @@ from .test_compat import patch
 class CreateAccessTokenTest(StandaloneAppTestCase):
     """
     Ouath2 client test cases.
+    Local imports of model-related files are required for in-IDE test runs.
+    Otherwise an import will be attempted before django.setup() call and
+    an exception is thrown.
     """
 
     @patch('oauth2_client.client._get_token')
