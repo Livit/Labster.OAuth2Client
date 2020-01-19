@@ -12,9 +12,9 @@ omit =
     *manage.py
     *labsterutils/*
     *tox/*
-    *test_runner.py
     *test_settings.py
     *test_case.py
+    *compat.py
 
 concurrency=multiprocessing
 

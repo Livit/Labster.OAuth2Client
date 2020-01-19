@@ -1,17 +1,17 @@
+import os
+
 import django
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 
-from test_settings import TEST_SETTINGS
-
 
 def setup_django():
     if not settings.configured:
-        settings.configure(**TEST_SETTINGS)
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
         # https://docs.djangoproject.com/en/1.11/topics/settings/#calling-django-setup-is-required-for-standalone-django-usage
         django.setup()
-        # applying migrations manually is needed only for running from within IDE
+        # convenience for IDE runs
         call_command('migrate')
     else:
         # this is the case when the tests are running in a context of some external django application, everything

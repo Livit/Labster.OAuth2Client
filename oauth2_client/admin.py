@@ -17,7 +17,7 @@ class AccessTokenAdmin(admin.ModelAdmin):
     """
     Admin support for AccessToken model.
     """
-    list_display = ("application", "created_at")
+    list_display = ("application", "created")
 
 
 admin.site.register(Application, ApplicationAdmin)

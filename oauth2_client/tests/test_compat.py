@@ -5,6 +5,7 @@ To avoid install of test requirements in production.
 """
 try:
     # python 3
-    from unittest.mock import patch
+    from unittest.mock import patch, Mock
 except ImportError:
-    from mock import patch
+    # python 2.7
+    from mock import patch, Mock

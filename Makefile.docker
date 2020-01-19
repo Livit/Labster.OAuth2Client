@@ -1,10 +1,10 @@
-.PHONY: restart d_setup logs start status stop
+.PHONY: restart docker_setup logs start status stop
 
 restart: ## stop && start
 restart: stop start
 
-d_setup: ## Setup local dev env for docker-compose.
-d_setup:
+docker_setup: ## Setup local dev env for docker-compose.
+docker_setup:
 		virtualenv .docker_env && ./.docker_env/bin/pip install -r requirements/docker.txt
 		touch .env
 
