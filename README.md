@@ -73,6 +73,7 @@ inside `requirements/tox_requirements{27|37}.txt`. Test settings live inside
 this is hardcoded to use python3
 - `make docker_setup`  # set up a venv for docker-compose
 - `make start && wait 5`  # start a dockerized PostgreSQL instance
+- `python test_manage.py migrate`  # apply migrations
 - point your IDE at `.venv` as the python installation to be used
 - tests should work in the IDE
 
