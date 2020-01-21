@@ -15,8 +15,10 @@ include Makefile.docker
 
 setup: ## Setup local dev env.
 setup:
-		virtualenv -p python3 .env && . .env/bin/activate && \
-	  pip install -r requirements/development.txt
+		virtualenv -p python3 .venv && . .venv/bin/activate && \
+	  pip install -r requirements/development.txt && \
+	  pip install -r requirements/tox_requirements37.txt  && \
+	  touch .env
 
 clean_coverage: ## Clean coverage reports.
 clean_coverage:
@@ -42,5 +44,5 @@ test: ## Run unit tests.
 
 trufflehog: ## Run trufflehog secret leaks tool
 trufflehog:
-		./.env/bin/trufflehog --exclude_paths trufflehog-exclude.txt --regex . && \
+		./.venv/bin/trufflehog --exclude_paths trufflehog-exclude.txt --regex . && \
 		echo "All good"
