@@ -46,8 +46,8 @@ Quick start
         authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
     }
 
-4. On the client side, create oauth2_client.Application model instance, and populate it.
-You can get help by calling `python manage.py oauth2client_app -h` .
+4. On the client side, create oauth2_client.Application model instance, and
+populate it. You can get help by calling `python manage.py oauth2client_app -h`.
 
 5. Instantiate the client via library calls, and use it for all api calls.
 
