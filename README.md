@@ -76,7 +76,8 @@ Tests use PostgresDb. See the `PostgreSQL` section for setup instructions.
 
 #### Codestyle
 
-Tox runs pycodestyle, but not pylint, because pylint checks for Django dependencies, which are not part of this project.
+Tox runs pycodestyle, but not pylint, because pylint checks for Django dependencies, which are not
+part of this project.
 
 ### Nuances
 
