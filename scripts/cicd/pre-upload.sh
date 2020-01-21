@@ -2,7 +2,7 @@
 TESTENV=$1
 
 pip install virtualenv
-virtualenv -p python3 env
+virtualenv --no-download -p python3 env
 source env/bin/activate
 pip install awscli==1.16.208
 
