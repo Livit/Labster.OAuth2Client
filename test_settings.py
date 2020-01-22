@@ -29,5 +29,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'oauth2_provider',  # not needed in production, unless you need to create provider's Applications
     'oauth2_client',
 )
