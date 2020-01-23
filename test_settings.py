@@ -1,8 +1,9 @@
 import logging
 import os
 
-# log only errors in testing
+# log only errors in testing. We want clean output.
 logging.disable(logging.WARNING)
+
 # allow HTTP for OAuth in testing
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -29,5 +30,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'oauth2_provider',  # not needed in production, unless you need to create provider's Applications
     'oauth2_client',
 )
