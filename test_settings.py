@@ -1,8 +1,9 @@
 import logging
 import os
 
-# log only errors in testing
+# log only errors in testing. We want clean output.
 logging.disable(logging.WARNING)
+
 # allow HTTP for OAuth in testing
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
