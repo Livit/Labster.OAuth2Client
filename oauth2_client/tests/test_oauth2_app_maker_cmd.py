@@ -1,8 +1,13 @@
 """
 Test cases for the `oauth2_app_maker` abstract django  parent command.
+
 These tests are a little clunky, as we have to turn an abstract tested
 command into a functional one on the fly. Due to the way Django registers
 commands upon startup, there seems to be no other (easy) way to do that.
+Using `tested_command.run_from_argv(...)` is not a good idea, as this would not
+test the entire django's invocation path. This command constitutes an important
+functionality of this package, so we want to use `call_command(...)` to invoke,
+as that exercises entire execution flow.
 
 Local imports of model-related files are required for in-IDE test runs.
 Otherwise a model import is attempted before django.setup() call and

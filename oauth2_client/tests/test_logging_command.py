@@ -11,7 +11,7 @@ from test_case import StandaloneAppTestCase
 
 class TestedCommand(LoggingBaseCommand):
     """
-    Object Under Test
+    Class to create Object Under Test
     """
     def handle(self, *args, **options):
         self.logger.debug("I am a debug message")
@@ -27,6 +27,9 @@ class TestLoggingCommand(StandaloneAppTestCase):
     """
 
     def setUp(self):
+        """
+        Create Object Under Test
+        """
         self.tested_cmd = TestedCommand()
 
     @classmethod
