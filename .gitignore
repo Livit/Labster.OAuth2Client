@@ -6,5 +6,8 @@
 /reports/
 .coverage
 .env
+.venv
 .docker_env
 .eggs/
+.idea
+.vscode

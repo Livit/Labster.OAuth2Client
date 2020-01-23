@@ -1,1 +1,4 @@
 labsterutils
+oauth2_client/tests/resources/.*
+README.md
+oauth2_client/tests/test_jwt_flow.py

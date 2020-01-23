@@ -22,3 +22,5 @@ echo "$STATE $RESULT"
 
 mkdir -p "artifacts/$TESTENV"
 find reports -maxdepth 1 -mindepth 1 | xargs -i mv {} "artifacts/$TESTENV";
+
+exit $TESTS_STATUS
