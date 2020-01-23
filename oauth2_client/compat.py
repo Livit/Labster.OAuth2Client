@@ -11,8 +11,8 @@ except ImportError:
 
 """
 `HelpTextFormatter` is a best-effort approach to provide readable formatting in
-help messages of Django Commands. "Help message" is what you see when add `-h` 
-to Command invocation. This functionality is not essential, removal will not 
+help messages of Django Commands. "Help message" is what you see when add `-h`
+to Command invocation. This functionality is not essential, removal will not
 break anything.
 """
 from argparse import RawTextHelpFormatter  # noqa
