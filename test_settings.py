@@ -8,8 +8,8 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 SECRET_KEY = 'psst'
 
-DEBUG = True,
-USE_TZ = True,
+DEBUG = True
+USE_TZ = True
 
 """
 Defaults are used when running from the IDE.
