@@ -4,7 +4,7 @@ Create an instance of OAuth2Client's Application in DB, from CLI.
 import json
 
 from oauth2_client.management.commands.oauth2_app_maker import Command as ParentCommand
-from oauth2_client.models import Application as AppModel
+from oauth2_client.models import Application
 from oauth2_client.utils.django.model import help_text
 
 
@@ -44,7 +44,7 @@ class Command(ParentCommand):
         """
         Application model type to be used
         """
-        return AppModel
+        return Application
 
     def add_arguments(self, parser):
         """
@@ -56,36 +56,36 @@ class Command(ParentCommand):
         parser.add_argument(
             '--client-id',
             type=str,
-            help=help_text('client_id', AppModel)
+            help=help_text('client_id', Application)
         )
         parser.add_argument(
             '--client-secret',
             type=str,
-            help=help_text('client_secret', AppModel)
+            help=help_text('client_secret', Application)
         )
         parser.add_argument(
             '--authorization-grant-type',
             type=str,
-            help=help_text('authorization_grant_type', AppModel),
-            choices=[g[0] for g in self.app_model().GRANT_TYPES]
+            help=help_text('authorization_grant_type', Application),
+            choices=[g[0] for g in Application.GRANT_TYPES]
         )
         parser.add_argument(
             '--service-host',
             type=str,
-            help=help_text('service_host', AppModel)
+            help=help_text('service_host', Application)
         )
         parser.add_argument(
             '--token-uri',
             type=str,
-            help=help_text('token_uri', AppModel)
+            help=help_text('token_uri', Application)
         )
         parser.add_argument(
             '--scope',
             type=str,
-            help=help_text('scope', AppModel)
+            help=help_text('scope', Application)
         )
         parser.add_argument(
             '--extra-settings',
             type=json.loads,
-            help=help_text('extra_settings', AppModel)
+            help=help_text('extra_settings', Application)
         )
