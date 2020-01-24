@@ -1,5 +1,12 @@
 """
-OAuth2 client for following grant types:
+HTTP(S) Session client, capable of running an OAuth2 authentication flow to
+obtain a token from an authorization provider.
+
+Enables authenticated communication between HTTP(s)-capable clients and servers.
+Identification is by means of OAuth token. Tokens are acquired by presentation
+of credentials, and may be refreshed by repeating the authorization flow.
+
+Supported OAuth2 grant types:
 - Client Credentials (e.g. service-to-service communication)
 - JWT Bearer token (e.g. Salesforce)
 """
