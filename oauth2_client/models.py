@@ -1,7 +1,7 @@
 """
 Ouath2 client models.
 """
-from django.contrib.postgres.fields import JSONField
+from django_extensions.db.fields.json import JSONField
 from django.db import models
 from django.utils import timezone
 
