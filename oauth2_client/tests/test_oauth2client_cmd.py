@@ -5,7 +5,6 @@ Local imports of model-related files are required for in-IDE test runs.
 Otherwise a model import is attempted before django.setup() call and
 an exception is thrown.
 """
-from unittest import skip
 
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
@@ -22,7 +21,6 @@ class TestClientAppMakerCommand(StandaloneAppTestCase):
     Test cases for the `oauth2client_app` django command.
     """
 
-    @skip("To be enabled once JWT-grant changes checked-in")
     def test_app_create(self):
         """
         Test creating various oauth applications with different parameters.
@@ -44,6 +42,7 @@ class TestClientAppMakerCommand(StandaloneAppTestCase):
                 '--service-host=%s' % service_host,
                 '--client-id=%s' % client_id,
                 '--token-uri=%s' % token_uri,
+                '--scope=read write',
                 '--client-secret=%s' % client_secret,
                 '--extra-settings={"subject": "%s"}' % test_email,
                 '-v 2'
@@ -58,8 +57,8 @@ class TestClientAppMakerCommand(StandaloneAppTestCase):
             self.assertEqual(check_app.client_id, client_id)
             self.assertEqual(check_app.client_secret, client_secret)
             self.assertEqual(check_app.extra_settings['subject'], test_email)
+            self.assertEqual(check_app.scope, "read write")
 
-    @skip("To be enabled once JWT-grant changes checked-in")
     def test_jwt_flow_validation(self):
         """
         Make sure creating JWT_BEARER application fails, if no subject provided

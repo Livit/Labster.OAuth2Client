@@ -38,15 +38,6 @@ def command_type_with_model(model_type):
     return Command
 
 
-def rich_test_model():
-    """
-    A fully functional App model used for testing.
-    TODO: replace this with oauth2_client.models.Application, in JWT-grant PR, once s/updated_at/updated.
-    """
-    from oauth2_provider.models import Application
-    return Application
-
-
 def test_add_arguments(parser):
     """
     To make tested command runnable, we need it to be able to accept input arguments.
@@ -70,11 +61,15 @@ def test_add_arguments(parser):
         type=str,
     )
     parser.add_argument(
-        '--client-type',
+        '--authorization-grant-type',
         type=str,
     )
     parser.add_argument(
-        '--authorization-grant-type',
+        '--service-host',
+        type=str,
+    )
+    parser.add_argument(
+        '--token-uri',
         type=str,
     )
 
@@ -117,25 +112,32 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         """
         Ensure Application gets created in the DB.
         """
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id
-        from oauth2_provider.models import Application
-        model_mock.return_value = rich_test_model()
+        from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
+        from oauth2_client.models import Application
+        model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
+        client_secret = fake_client_secret()
+        service_host = faker.url()
+        token_uri = faker.url()
 
         cmd_args = [
             'oauth2_app_maker',
             '--name=%s' % app_name,
             '--client-id=%s' % client_id,
-            '--client-type=confidential',
-            '--authorization-grant-type=client-credentials'
+            '--authorization-grant-type=client-credentials',
+            '--client-secret=%s' % client_secret,
+            '--service-host=%s' % service_host,
+            '--token-uri=%s' % token_uri
         ]
         call_command(*cmd_args)
 
         check_app = Application.objects.get(name=app_name)
         self.assertEqual(check_app.authorization_grant_type, 'client-credentials')
-        self.assertEqual(check_app.client_type, 'confidential')
         self.assertEqual(check_app.client_id, client_id)
+        self.assertEqual(check_app.client_secret, client_secret)
+        self.assertEqual(check_app.service_host, service_host)
+        self.assertEqual(check_app.token_uri, token_uri)
 
     @patch.object(TestedCommand, 'add_arguments', side_effect=test_add_arguments)
     @patch.object(TestedCommand, 'app_model')
@@ -145,8 +147,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         Creation should be aborted upon validation error.
         """
         from oauth2_client.tests.factories import fake_app_name, fake_client_id
-        from oauth2_provider.models import Application
-        model_mock.return_value = rich_test_model()
+        from oauth2_client.models import Application
+        model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
 
@@ -154,8 +156,7 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
             'oauth2_app_maker',
             '--name=%s' % app_name,
             '--client-id=%s' % client_id,
-            '--client-type=%s' % Application.CLIENT_CONFIDENTIAL,
-            '--authorization-grant-type=%s' % Application.GRANT_AUTHORIZATION_CODE
+            '--authorization-grant-type=client-credentials'
         ]
         with LogCapture() as logs:
             with self.assertRaises(ValidationError):
@@ -172,7 +173,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         Ensure we can't update a nonexistent application.
         """
         from oauth2_client.tests.factories import fake_app_name, fake_client_id
-        model_mock.return_value = rich_test_model()
+        from oauth2_client.models import Application
+        model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
 
@@ -196,18 +198,21 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         Ensure update functionality works fine.
         """
         from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
-        from oauth2_provider.models import Application
-        model_mock.return_value = rich_test_model()
+        from oauth2_client.models import Application
+        model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
         client_secret = fake_client_secret()
+        service_host = faker.url()
+        token_uri = faker.url()
         cmd_args = [
             'oauth2_app_maker',
             '--name=%s' % app_name,
-            '--authorization-grant-type=%s' % Application.GRANT_CLIENT_CREDENTIALS,
-            '--client-type=%s' % Application.CLIENT_CONFIDENTIAL,
+            '--authorization-grant-type=client-credentials',
             '--client-id=%s' % client_id,
             '--client-secret=%s' % client_secret,
+            '--service-host=%s' % service_host,
+            '--token-uri=%s' % token_uri,
             '-v 2'
         ]
 
@@ -219,7 +224,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         create_time_1 = check_app.created
         grant_type_1 = check_app.authorization_grant_type
         client_secret_1 = check_app.client_secret
-        client_type_1 = check_app.client_type
+        service_host_1 = check_app.service_host
+        token_uri_1 = check_app.token_uri
 
         client_id_2 = fake_client_id()
         cmd_args = [
@@ -242,8 +248,9 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
 
         # verify other existing properties didn't change
         self.assertEqual(grant_type_1, check_app.authorization_grant_type)
-        self.assertEqual(client_type_1, check_app.client_type)
         self.assertEqual(client_secret_1, check_app.client_secret)
+        self.assertEqual(service_host_1, check_app.service_host)
+        self.assertEqual(token_uri_1, check_app.token_uri)
 
     @patch.object(TestedCommand, 'add_arguments', side_effect=test_add_arguments)
     @patch.object(TestedCommand, 'app_model')
@@ -253,18 +260,21 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         Update should be aborted on validation errors.
         """
         from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
-        from oauth2_provider.models import Application
-        model_mock.return_value = rich_test_model()
+        from oauth2_client.models import Application
+        model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
         client_secret = fake_client_secret()
+        service_host = faker.url()
+        token_uri = faker.url()
         cmd_args = [
             'oauth2_app_maker',
             '--name=%s' % app_name,
-            '--authorization-grant-type=%s' % Application.GRANT_CLIENT_CREDENTIALS,
-            '--client-type=%s' % Application.CLIENT_CONFIDENTIAL,
+            '--authorization-grant-type=client-credentials',
             '--client-id=%s' % client_id,
             '--client-secret=%s' % client_secret,
+            '--service-host=%s' % service_host,
+            '--token-uri=%s' % token_uri,
             ]
 
         call_command(*cmd_args)
@@ -274,13 +284,15 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         upd_time_1 = check_app.updated
         create_time_1 = check_app.created
         grant_type_1 = check_app.authorization_grant_type
+        service_host_1 = check_app.service_host
+        token_uri_1 = check_app.token_uri
 
         # attempt to make a forbidden change
         cmd_args = [
             'oauth2_app_maker',
             '--update',
             '--name=%s' % app_name,
-            '--authorization-grant-type=%s' % Application.GRANT_AUTHORIZATION_CODE,
+            '--token-uri='
             ]
 
         with LogCapture() as logs:
@@ -296,3 +308,5 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         self.assertEqual(upd_time_1, check_app.updated)
         self.assertEqual(create_time_1, check_app.created)
         self.assertEqual(grant_type_1, check_app.authorization_grant_type)
+        self.assertEqual(service_host_1, check_app.service_host)
+        self.assertEqual(token_uri_1, check_app.token_uri)
