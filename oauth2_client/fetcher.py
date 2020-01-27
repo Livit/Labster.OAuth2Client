@@ -241,7 +241,8 @@ class JWTFetcher(Fetcher):
 
 class ClientCredentialsFetcher(Fetcher):
     """
-    Token fetcher for the Client Credentials flow.
+    Token fetcher for Client Credentials flow (AKA Backend Application flow).
+    See for more: https://oauthlib.readthedocs.io/en/latest/oauth2/grants/credentials.html
     """
 
     def fetch_raw_token(self):
