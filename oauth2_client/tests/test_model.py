@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import pytz
 
 from oauth2_client.tests.test_compat import patch
-from oauth2_client.utils.date_time import datetime_to_float
 from test_case import StandaloneAppTestCase
 
 
@@ -38,7 +37,6 @@ class TestModel(StandaloneAppTestCase):
         with patch('oauth2_client.models.timezone.now', return_value=now):
             actual = token.to_client_dict()
             expected = {
-                'expires_at': int(datetime_to_float(datetime(1970, 1, 1, 1, 0, 0))),
                 'expires_in': 3600,
                 'access_token': 'this-is-token',
                 'token_type': 'bearer',

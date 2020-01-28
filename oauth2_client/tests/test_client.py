@@ -9,13 +9,15 @@ from datetime import timedelta
 
 import requests_mock
 import six
+from ddt import data, ddt
 from django.utils import timezone
-from oauthlib.oauth2 import TokenExpiredError
+from pybreaker import CircuitBreakerError
 
 from test_case import StandaloneAppTestCase
-from .test_compat import Mock, patch
+from .test_compat import patch
 
 
+@ddt
 class ClientTest(StandaloneAppTestCase):
     """
     OAuth2 client test cases.
@@ -41,8 +43,8 @@ class ClientTest(StandaloneAppTestCase):
         )
         fetch_token_mock.return_value = token_from_provider
 
-        client = get_client(app.name)
-        self.assertIsNotNone(client)
+        tested_client = get_client(app.name)
+        self.assertIsNotNone(tested_client)
         token_from_db = AccessToken.objects.get(application=app)
         self.assertEqual(token_from_provider.token, token_from_db.token)
         self.assertEqual(
@@ -68,12 +70,35 @@ class ClientTest(StandaloneAppTestCase):
             expires=now + timedelta(seconds=AccessToken.TIMEOUT_SECONDS + 10),
             created=now,
         )
-        client = get_client(app.name)
-        self.assertIsNotNone(client)
+        tested_client = get_client(app.name)
+        self.assertIsNotNone(tested_client)
         # ensure client uses new token now
-        self.assertEqual(access_token.token, client.token['access_token'])
+        self.assertEqual(access_token.token, tested_client.token['access_token'])
         fetch_token_mock.assert_not_called()
-        self.assertFalse(AccessToken.objects.filter(application=app).exclude(id=access_token.id).exists())
+        self.assertFalse(
+            AccessToken.objects.filter(application=app)  # pylint: disable=maybe-no-member
+            .exclude(id=access_token.id).exists()
+        )
+
+    @patch('oauth2_client.client.fetch_token')
+    @requests_mock.Mocker()
+    def test_client_returns_data(self, fetch_token_mock, mock_response):
+        """
+        Given a valid token, ensure the client returns data
+        """
+        from oauth2_client.client import get_client
+        from .factories import AccessTokenFactory, ApplicationFactory
+        api_url = 'https://some-api.com/api/hello'
+        app = ApplicationFactory()
+        access_token = AccessTokenFactory(
+            application=app,
+        )
+        fetch_token_mock.return_value = access_token
+        mock_response.get(api_url, status_code=200, text='hello world!')
+        tested_client = get_client(app.name)
+        response = tested_client.get(api_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.text, 'hello world!')
 
     @patch('oauth2_client.client.fetch_token')
     def test_token_expired(self, fetch_token_mock):
@@ -104,10 +129,10 @@ class ClientTest(StandaloneAppTestCase):
         )
         fetch_token_mock.return_value = new_token
 
-        client = get_client(app.name)
-        self.assertIsNotNone(client)
+        tested_client = get_client(app.name)
+        self.assertIsNotNone(tested_client)
         # ensure client uses new token now
-        self.assertEqual(new_token.token, client.token['access_token'])
+        self.assertEqual(new_token.token, tested_client.token['access_token'])
         access_tokens = AccessToken.objects.filter(application=app)
         self.assertEqual(2, access_tokens.count())
         fetch_token_mock.assert_called_once_with(app)
@@ -130,18 +155,22 @@ class ClientTest(StandaloneAppTestCase):
             application=app,
         )
 
-        client = get_client(app.name)
-        self.assertEqual(client.token['access_token'], access_token)
+        tested_client = get_client(app.name)
+        self.assertEqual(tested_client.token['access_token'], access_token)
 
         access_tokens = AccessToken.objects.filter(application=app)
         self.assertEqual(1, access_tokens.count())
         fetch_token_mock.assert_not_called()
 
+    @patch('oauth2_client.client.fetch_and_store_token')
     @requests_mock.Mocker()
-    def test_token_expires_in_client_no_callback(self, mocked_request):
+    @data(401, 403)
+    def test_expired_token_refetched(self, bad_code, mock_fetch_token, mock_response):
         """
-        If the client encounters TokenExpiredError when handling a request and
-        there is no callback registered, make sure the exception is re-raised.
+        Token expiry detection gets triggered by a bad status code.
+        Ensure token refetch is attempted. 401 is a common way to convey token
+        expiry. 403 is what `oauth2_provider` seems to be using.
+        More about codes: https://stackoverflow.com/questions/30826726/how-to-identify-if-the-oauth-token-has-expired
         """
         from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
         from oauth2_client.client import OAuth2Client
@@ -151,39 +180,18 @@ class ClientTest(StandaloneAppTestCase):
         token = AccessTokenFactory(
             application=app
         )
+        mock_fetch_token.return_value = token
+        tested_client = OAuth2Client(token)
+        # MOCK: first response is bad, next token is refetched, second response is 200 OK
+        mock_response.get(api_url, [{'status_code': bad_code}, {'status_code': 200}])
+        tested_client.get(api_url)
+        mock_fetch_token.assert_called_once_with(app)
 
-        c = OAuth2Client(token)
-        mocked_request.get(api_url, status_code=403)
-        with self.assertRaises(TokenExpiredError):
-            c.get(api_url)
-
+    @patch('oauth2_client.client.fetch_and_store_token')
     @requests_mock.Mocker()
-    def test_token_expires_in_client_callback_is_present(self, mocked_request):
+    def test_expired_tokens_break_circuit(self, mock_fetch_token, mock_response):
         """
-        If the client encounters TokenExpiredError when handling a request and the
-        `expired_callback` is specified, make sure the client tries to fetch new token
-        """
-        from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
-        from oauth2_client.client import OAuth2Client
-
-        api_url = 'https://some-api.com/api/hello'
-        app = ApplicationFactory()
-        token = AccessTokenFactory(
-            application=app
-        )
-
-        expired_callback = Mock(return_value=token)
-        c = OAuth2Client(token, expired_callback=expired_callback)
-        # MOCK: first response is 403 Forbidden, next expired_callback is called, second response is 200 OK
-        mocked_request.get(api_url, [{'status_code': 403}, {'status_code': 200}])
-        c.get(api_url)
-        expired_callback.assert_called_once_with(app)
-
-    @requests_mock.Mocker()
-    def test_token_expired_callback_safety_fuse(self, mocked_request):
-        """
-        If `expired_callback` is called twice within 10s period, that means
-        something is wrong and we raise an exception.
+        Token re-fetch circuit opens upon receiving bad status code twice in a row.
         """
         from oauth2_client.client import OAuth2Client
         from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
@@ -193,12 +201,11 @@ class ClientTest(StandaloneAppTestCase):
         token = AccessTokenFactory(
             application=app,
         )
-
-        expired_callback = Mock(return_value=token)
-        c = OAuth2Client(token, expired_callback=expired_callback)
-        # MOCK: first response is forbidden, next expired_callback is called, second response is
-        # forbidden too
-        mocked_request.get(api_url, [{'status_code': 403}, {'status_code': 403}])
-        with six.assertRaisesRegex(self, TokenExpiredError, "More than one token re-fetch"):
-            c.get(api_url)
-        expired_callback.assert_called_once_with(app)
+        mock_fetch_token.return_value = token
+        tested_client = OAuth2Client(token)
+        # MOCK: first response is 403 forbidden, next token is successfully refetched,
+        # but second response is 403 forbidden too. Circuit opens.
+        mock_response.get(api_url, [{'status_code': 403}, {'status_code': 403}])
+        with six.assertRaisesRegex(self, CircuitBreakerError, "Failures threshold reached"):
+            tested_client.get(api_url)
+        mock_fetch_token.assert_called_once_with(app)

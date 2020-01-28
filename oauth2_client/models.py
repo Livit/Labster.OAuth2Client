@@ -10,8 +10,6 @@ from django.db import models
 from django.forms import model_to_dict
 from django.utils import timezone
 
-from oauth2_client.utils.date_time import datetime_to_float
-
 
 class Application(models.Model):
     """
@@ -111,11 +109,9 @@ class AccessToken(models.Model):
     Access token to talk to the resource owner
     """
 
-    """
-    Used to prevent the token expiration when the request is processed on the resource owner side.
-    This value is simply subtracted from token's `expiry` when checking validity.
-    """
-    TIMEOUT_SECONDS = float(60)
+    # Used to prevent the token expiration when the request is processed on the resource owner side.
+    # This value is simply subtracted from token's `expiry` when checking validity.
+    TIMEOUT_SECONDS = 60.0
 
     token = models.CharField(
         max_length=255,
@@ -178,7 +174,6 @@ class AccessToken(models.Model):
         if 'expires' in as_dict and as_dict['expires']:
             # expiry info can be used by oauth2_session (client's 3rd party parent class)
             expires_dt = as_dict.pop('expires')
-            as_dict["expires_at"] = int(datetime_to_float(expires_dt))
             as_dict["expires_in"] = (expires_dt - timezone.now()).total_seconds()
         return as_dict
 
@@ -189,4 +184,4 @@ class AccessToken(models.Model):
         return "Access token for {}".format(self.application)
 
     def __str__(self):
-        return "<AccessToken, pk:{}>".format(self.pk)
+        return "<AccessToken, pk:{}, for: {}>".format(self.pk, self.application)

@@ -14,7 +14,7 @@ NOTE: by `Application` or `App` we mean an OAuth application and its
 import json
 import logging
 from base64 import urlsafe_b64encode
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytz
 import requests
@@ -94,6 +94,10 @@ class Fetcher:
 
         Returns:
             oauth2_client.models.AccessToken: token in standardized format
+
+        Raises:
+            KeyError: When the data received from auth server does not contain access token.
+                This probably means authentication issues on our side, e.g. bad auth request.
         """
         try:
             return AccessToken(

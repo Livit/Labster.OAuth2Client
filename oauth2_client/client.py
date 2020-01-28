@@ -11,9 +11,8 @@ Supported OAuth2 grant types:
 - JWT Bearer token (e.g. Salesforce)
 """
 import logging
-from datetime import timedelta
 
-from django.utils import timezone
+import pybreaker
 from oauthlib.oauth2 import TokenExpiredError
 from requests_oauthlib import OAuth2Session
 
@@ -23,6 +22,12 @@ from oauth2_client.models import AccessToken, Application
 
 log = logging.getLogger(__name__)
 
+# Protect integration point with authorization provider
+token_breaker = pybreaker.CircuitBreaker(fail_max=3, reset_timeout=10)
+
+# Protect integration point with communication receiver (resource owner)
+request_breaker = pybreaker.CircuitBreaker(fail_max=2, reset_timeout=10)
+
 
 class OAuth2Client(OAuth2Session):
     """
@@ -31,65 +36,60 @@ class OAuth2Client(OAuth2Session):
     Wrapper around OAuth2Session to cache service host on the class instantiation and use it to transform
     relative urls to absolute ones.
 
+    Expired OAuth2 token can be refreshed by repeating the authorization flow. Token refresh
+    functionality is protected with circuit breakers, to avoid spamming authorization provider
+    and resource owner in case of system failure. Token expiry detection uses best-effort approach,
+    as there is no standardized way of informing the client of token expiry. The mechanism tries
+    to fetch new token and retries the request once. If unsuccessful - CircuitBreakerError is raised.
+
+    Explanation:
+        The parent class, OAuth2Session already implements automated token refresh,
+        but their solution works only for flows that issue a refresh_token. Both currently
+        supported flows, JWT and Client Credentials don't provide the refresh_token, so we have
+        to handle the refresh ourselves. (Client Credentials MAY issue refresh_token but it
+        doesn't in case of the `oauth2_provider` we use).
+
     Example:
         > # get OAuth2Client instance for the application
         > client = get_client('license')
         > # make API HTTP call by URL without host
         > r = client.get('/api/license/1/detail/')
     """
-
-    """
-    If token re-fetch happens more than once in this period, raise an exception. Something is wrong,
-    don't spam the provider.
-    """
-    REAUTH_LIMIT_SECONDS = 10
-
-    def __init__(self, token, expired_callback=None):
+    def __init__(self, token):
         """
         Create OAuth2Client
 
-        :param token: oauth2_client.model.AccessToken object
-        :param expired_callback: (optional) function accepting one parameter, `Application`. It is
-            called when TokenExpiredError is detected or 403 Forbidden status code received.
-            It should return a valid (not expired) oauth2_client.model.AccessToken object for
-            communication with Resource Owner specified by `Application`.
-            Explanation: The parent class, OAuth2Session already implements automated token refresh,
-            but their solution works only for flows that issue a refresh_token. Both currently
-            supported flows, JWT and Client Credentials don't provide the refresh_token, so we have
-            to handle the refresh ourselves. (Client Credentials MAY issue refresh_token but it
-            doesn't in case of the `oauth2_provider` we use). If the token expiry is detected more
-            than once within `REAUTH_LIMIT_SECONDS` period, `oauthlib.oauth2.TokenExpiredError`
-            is raised (safety fuse approach).
+        :param token: oauth2_client.model.AccessToken
         """
         self.app = token.application  # Application this client talks to
-        self.last_token_fetch_time = None  # used for the safety fuse preventing too often re-authorization
         self.service_host = self.app.service_host  # used to transform relative URLs to absolute
-        self.expired_callback = self._install_callback(expired_callback) if expired_callback else None
         super(OAuth2Client, self).__init__(client_id=self.app.client_id, token=token.to_client_dict())
 
-    def _install_callback(self, expired_callback):
+    @request_breaker
+    def make_request(self, method, url, *args, **kwargs):
         """
-        Wraps provided expiry callback into a safety fuse, so we won't spam the provider with token
-        requests in case of problems with the client.
+        Make HTTP(S) request. Make best effort to detect token expiry.
 
-        :param expired_callback: a function taking one argument, `oauth2_client.models.Application`.
-            It has to fetch and store new AccessToken.
-        :return:  a wrapped callback function
+        Two mechanisms are used for expiry detection:
+        1) check expiration datetime on the token itself. This is baked into the call to 3rd party's
+            super().request. Tokens are not guaranteed to contain this information.
+        2) interpret 4xx status code received as token expiry error. Based on discussion in
+            referenced thread.
+
+        Reference:
+            > Since different services can use different error codes for expired tokens,
+            > you can either keep track of the code for each service or an easy way to
+            > refresh tokens across services is to simply try a single refresh upon encountering
+            > a 4xx error.
+            Source: https://stackoverflow.com/questions/30826726/how-to-identify-if-the-oauth-token-has-expired
+
+        Raises:
+            TokenExpiredError: upon token expiry detection
         """
-        def wrapped_callback(app):
-            if self.last_token_fetch_time \
-                    and self.last_token_fetch_time + timedelta(seconds=self.REAUTH_LIMIT_SECONDS) >= timezone.now():
-                raise TokenExpiredError(
-                    description="More than one token re-fetch attempt in %ss period. This means "
-                                "either: 1) your authorization provider issues very short-living tokens, "
-                                "you should raise the REAUTH_LIMIT_SECONDS value; 2) problem with the client"
-                                % self.REAUTH_LIMIT_SECONDS
-                )
-            new_token = expired_callback(app)
-            self.last_token_fetch_time = timezone.now()
-            return new_token
-
-        return wrapped_callback
+        resp = super(OAuth2Client, self).request(method, url, *args, **kwargs)
+        if 400 <= resp.status_code < 500:
+            raise TokenExpiredError(description="4xx status code received. Assuming expired token.")
+        return resp
 
     def request(self, method, url, *args, **kwargs):  # pylint: disable=arguments-differ
         """
@@ -103,27 +103,18 @@ class OAuth2Client(OAuth2Session):
             Response object.
 
         Raises:
-            TokenExpiredError: 1) when token expiry detected and `expired_callback` not specified;
-                2) when 403 Forbidden status code received and `expired_callback` not specified;
-                3) when `expired_callback` is specified and more than one token re-fetch happens
-                within `REAUTH_LIMIT_SECONDS` period.
+            CircuitBreakerError:
+                1) token re-fetch circuit opens due to failure threshold reached;
+                2) request circuit opens due to failure threshold reached;
         """
         absolute_url = urljoin(self.service_host, url)
         try:
-            # super().request may raise `TokenExpiredError`
-            resp = super(OAuth2Client, self).request(method, absolute_url, *args, **kwargs)
-            if resp.status_code == 403:
-                raise TokenExpiredError(description="403 Forbidden status code response received")
-            else:
-                return resp
+            return self.make_request(method, absolute_url, *args, **kwargs)
         except TokenExpiredError:
-            log.debug("Access Token for app=%s expired.", self.app.name)
-            if not self.expired_callback:
-                raise
-            new_token = self.expired_callback(self.app)
+            log.debug("Attempting to fetch a new token for %s", self.app)
+            new_token = fetch_and_store_token(self.app)
             self.token = new_token.to_client_dict()
-            log.debug("Obtained new token. Retrying request.")
-            return self.request(method, url, *args, **kwargs)
+            return self.make_request(method, absolute_url, *args, **kwargs)
 
 
 def get_client(app_name):
@@ -149,10 +140,10 @@ def get_client(app_name):
     if not token or token.is_expired():
         app = token.application if token else Application.objects.get(name=app_name)
         token = fetch_and_store_token(app)
+    return OAuth2Client(token)
 
-    return OAuth2Client(token, expired_callback=fetch_and_store_token)
 
-
+@token_breaker
 def fetch_and_store_token(app):
     """
     Obtain a new token from auth provider and store in database.
@@ -162,7 +153,11 @@ def fetch_and_store_token(app):
 
     Returns:
         oauth2_client.models.AccessToken: access token
+
+    Raises:
+        KeyError: when Fetcher is unable to parse received data as an AccessToken
     """
     token = fetch_token(app)
     token.save()
+    log.debug('Fetched and stored %s', token)
     return token

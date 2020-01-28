@@ -26,3 +26,5 @@ generated-members =
     revision,
     _meta,
     through,
+
+max-line-length=120
