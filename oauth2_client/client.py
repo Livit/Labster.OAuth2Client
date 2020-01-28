@@ -112,7 +112,7 @@ class OAuth2Client(OAuth2Session):
         can be reattempted in 10s, after the breaker resets.
 
         Arguments:
-            method (str): HTTP method f.e. POST, GET.
+            method (str): HTTP method e.g. POST, GET.
             url (str): relative request URL.
 
         Returns:
@@ -145,7 +145,7 @@ def get_client(app_name):
     the authorization flow.
 
     Arguments:
-        app_name (str): name of the OAuth client application to make requests to f.e. license.
+        app_name (str): name of the OAuth client application to make requests to e.g. license.
 
     Returns:
         client (oauth2_client.OAuth2Client): OAuth2 client for authenticated HTTP(S) communication

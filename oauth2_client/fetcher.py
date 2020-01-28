@@ -106,7 +106,7 @@ class Fetcher:
                 scope=self.received_scope(raw_token),
                 raw_token=raw_token,
                 token_type=raw_token['token_type'],
-                expires=expires_or_none(raw_token),
+                expires=expiry_date(raw_token),
             )
         except KeyError:
             log.error(
@@ -263,7 +263,7 @@ class ClientCredentialsFetcher(Fetcher):
         )
 
 
-def expires_or_none(raw_token):
+def expiry_date(raw_token):
     """
     Determine token's expiry date if available. The RFC isn't strict about this,
     so aren't we. JWT Bearer grant type doesn't return expiration info at all.
@@ -298,10 +298,8 @@ def expires_or_none(raw_token):
         expires = None
 
     if expires and expires <= timezone.now():
-        log.warning(
-            "Received token already expired. Returning None for `expires` value. "
-            "Provider error or parsing issue?"
+        raise ValueError(
+            'Received token already expired. This is most likely provider issue. Received token: {}'.format(raw_token)
         )
-        expires = None
 
     return expires

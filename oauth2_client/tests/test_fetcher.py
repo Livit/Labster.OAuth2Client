@@ -29,11 +29,11 @@ class FetcherTest(StandaloneAppTestCase):
         `Expires` field is not guaranteed on the token, so we use best effort approach.
         E.g. token obtained with JWT flow never contains expiry information.
         """
-        from oauth2_client.fetcher import expires_or_none
+        from oauth2_client.fetcher import expiry_date
         raw_token = {
             'expires_at': datetime_to_float(timezone.now() - timedelta(hours=40))
         }
-        expires_actual = expires_or_none(raw_token)
+        expires_actual = expiry_date(raw_token)
         self.assertEqual(expires_actual, None)
 
     def test_raw_token_parsing_error(self):
