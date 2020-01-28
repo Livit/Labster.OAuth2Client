@@ -191,7 +191,8 @@ class ClientTest(StandaloneAppTestCase):
     @requests_mock.Mocker()
     def test_expired_tokens_break_circuit(self, mock_fetch_token, mock_response):
         """
-        Token re-fetch circuit opens upon receiving bad status code twice in a row.
+        Circuit breaker opens when two 4xx codes received in a row. 4xx status code
+        is used as one of the ways of detecting token expiry.
         """
         from oauth2_client.client import OAuth2Client
         from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
