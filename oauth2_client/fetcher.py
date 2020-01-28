@@ -40,11 +40,11 @@ def fetch_token(app):
     Returns:
         oauth2_client.models.AccessToken: obtained token
     """
-    grant_to_fetcher_type = {
+    fetcher_grant_dispatcher = {
         Application.GRANT_CLIENT_CREDENTIALS: ClientCredentialsFetcher,
         Application.GRANT_JWT_BEARER: JWTFetcher,
     }
-    fetcher = grant_to_fetcher_type[app.authorization_grant_type](app)
+    fetcher = fetcher_grant_dispatcher[app.authorization_grant_type](app)
     return fetcher.fetch_token()
 
 
@@ -103,7 +103,7 @@ class Fetcher:
             return AccessToken(
                 application=self.app,
                 token=raw_token['access_token'],
-                scope=self.extract_received_scope(raw_token),
+                scope=self.received_scope(raw_token),
                 raw_token=raw_token,
                 token_type=raw_token['token_type'],
                 expires=expires_or_none(raw_token),
@@ -124,7 +124,7 @@ class Fetcher:
         scope = self.app.scope
         return scope.split() if scope else []
 
-    def extract_received_scope(self, token, default=""):
+    def received_scope(self, token, default=""):
         """
         Extract scope granted by the provider from the token. The RFC isn't
         strict about the scope, so aren't we.
@@ -144,19 +144,16 @@ class Fetcher:
         Returns:
             scope string or default
         """
-        received = getattr(token, "scope", None)
-        if received is None:
-            received = token.get('scope', default)
+        received = getattr(token, 'scope', token.get('scope', default))
 
         # check if we got what we asked for
-        requested = self.requested_scope()
-        requested_scope = set(requested)
+        requested_scope = set(self.requested_scope())
         received_scope = set(received.split())
         if requested_scope != received_scope:
             log.warning(
                 'Received different scope than requested. Requested: %s, received: %s. '
                 'Just a heads-up, ignore this unless you are debugging permission issues.',
-                requested, received
+                requested_scope, received_scope
             )
 
         return received
