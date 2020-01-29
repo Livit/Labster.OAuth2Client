@@ -14,4 +14,7 @@ hvcNAQELBQADgYEAihfi+Km+Pwcf78Y+aS6V15dUbK2xFyTcUw/QDwcJPvY+Mdgz
 wiBxXMHJBGHaTCFNOJ8QYk5oVvorDbQiC6d9L45+bqmCCO97Aw47DMk/NXY=
 -----END CERTIFICATE-----
 
-# needed for oauth2_client/tests/test_flow_jwt.py and oauth2_client/tests/test_crypto.py
+# This certificate is not currently used anywhere in testing. However it constitutes
+# a pair with `test.key` from this directory. Think of this cert as a public key,
+# and `test.key` as a private key. Feel free to use it for testing at your convenience.
+# The pair was generated solely for test purposes and is not used for anything else.
