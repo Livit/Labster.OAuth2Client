@@ -37,7 +37,8 @@ class TestJWTFlow(StandaloneAppTestCase):
         """
         Test JWT Token Bearer flow fetches token
         """
-        from .ide_test_compat import fetch_token, ApplicationFactory
+        from .ide_test_compat import ApplicationFactory
+        from oauth2_client.client import fetch_token
 
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
@@ -87,7 +88,8 @@ class TestJWTFlow(StandaloneAppTestCase):
         """
         Test JWT Token Bearer flow. No scope returned from provider.
         """
-        from .ide_test_compat import fetch_token, ApplicationFactory
+        from .ide_test_compat import ApplicationFactory
+        from oauth2_client.client import fetch_token
 
         app_data = {
             'authorization_grant_type': 'jwt-bearer',

@@ -35,7 +35,8 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         Test client credentials flow (AKA backend flow).
         Scope is present in provider's response.
         """
-        from .ide_test_compat import ApplicationFactory, fetch_token
+        from .ide_test_compat import ApplicationFactory
+        from oauth2_client.client import fetch_token
 
         token_uri = 'http://this-is-fake.region.nip.io:8200/o/token/'
         app_data = {
@@ -70,7 +71,8 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """
         Test client credentials flow, no scope returned from the provider.
         """
-        from .ide_test_compat import ApplicationFactory, fetch_token
+        from .ide_test_compat import ApplicationFactory
+        from oauth2_client.client import fetch_token
 
         token_uri = 'http://this-is-fake.region.nip.io:8200/o/token/'
         app_data = {
@@ -105,7 +107,8 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """
         Test client credentials flow with `expires_at` returned
         """
-        from .ide_test_compat import ApplicationFactory, fetch_token
+        from .ide_test_compat import ApplicationFactory
+        from oauth2_client.client import fetch_token
 
         token_uri = 'http://this-is-fake.region.nip.io:8200/o/token/'
         app_data = {
