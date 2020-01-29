@@ -129,6 +129,7 @@ class Fetcher:
         Extract scope granted by the provider from the token. The RFC isn't
         strict about the scope, so aren't we.
 
+        Reference:
             > The authorization server MAY fully or partially ignore the scope
             > requested by the client, based on the authorization server policy or
             > the resource owner's instructions.  If the issued access token scope
@@ -142,18 +143,23 @@ class Fetcher:
             default: value to return when no scope info found
 
         Returns:
-            scope string or default
+            str: scope as one string or default
         """
-        received = getattr(token, 'scope', token.get('scope', default))
+        # This accounts for all required cases and assigns a default properly,
+        # don't change unless real issues caused.
+        received = getattr(token, "scope", None)
+        if received is None:
+            received = token.get('scope', default)
 
         # check if we got what we asked for
-        requested_scope = set(self.requested_scope())
-        received_scope = set(received.split())
-        if requested_scope != received_scope:
+        requested_list = self.requested_scope()
+        requested_set = set(requested_list)
+        received_set = set(received.split())
+        if requested_set != received_set:
             log.warning(
                 'Received different scope than requested. Requested: %s, received: %s. '
                 'Just a heads-up, ignore this unless you are debugging permission issues.',
-                requested_scope, received_scope
+                requested_list, received.split()
             )
 
         return received
@@ -289,6 +295,9 @@ def expiry_date(raw_token):
 
     Returns:
         datetime: a timezone-aware datetime object or None
+
+    Raises:
+        ValueError: when received token already expired
     """
     if 'expires_in' in raw_token:
         expires = timezone.now() + timedelta(seconds=raw_token['expires_in'])
@@ -299,7 +308,8 @@ def expiry_date(raw_token):
 
     if expires and expires <= timezone.now():
         raise ValueError(
-            'Received token already expired. This is most likely provider issue. Received token: {}'.format(raw_token)
+            'Received token already expired. This means either parsing issue on our side or auth '
+            'provider gone insane. Received token: {}'.format(raw_token)
         )
 
     return expires

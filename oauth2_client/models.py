@@ -48,7 +48,6 @@ class Application(models.Model):
         max_length=200,
         help_text="Token URL. For example: http://service-a:8000/o/token/"
     )
-    # Scope is a series of space delimited strings, eg. "read write"
     scope = models.CharField(
         max_length=100,
         blank=True,
@@ -136,7 +135,6 @@ class AccessToken(models.Model):
         null=True
     )
 
-    # Scope is a series of space delimited strings, eg. "read write"
     scope = models.TextField(
         blank=True,
         default="",

@@ -1,51 +1,71 @@
 """
 Test Fetcher module functionality that was not tested anywhere else
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 from datetime import timedelta
 
+import six
+from ddt import data, ddt
 from django.utils import timezone
 from testfixtures import LogCapture
 
+from oauth2_client.fetcher import Fetcher, expiry_date
+from oauth2_client.tests.factories import ApplicationFactory
+from oauth2_client.tests.test_compat import patch
 from oauth2_client.utils.date_time import datetime_to_float
 from test_case import StandaloneAppTestCase
 
 
+class TestToken:
+    """
+    Dummy token class for scope testing.
+    """
+    def __init__(self, scope):
+        self.scope = scope
+
+
+@ddt
 class FetcherTest(StandaloneAppTestCase):
     """
     Test Fetcher module functionality that was not tested anywhere else
     """
 
-    def test_expires_in_the_past_ignored(self):
+    def test_expires_in_the_past_raises(self):
         """
-        Ensure `expires` timestamp in the past is ignored.
-
-        If the extracted `expires` is already in the past when parsing new token,
-        assume this is a mistake and return `None`. This will make the client attempt
-        the communication anyway, ignoring theoretically expired token.
-        `Expires` field is not guaranteed on the token, so we use best effort approach.
-        E.g. token obtained with JWT flow never contains expiry information.
+        Ensure `expires` timestamp (on the token) in the past raises an exception.
+        This means either parsing issues on our side, or auth provider gone insane.
         """
-        from oauth2_client.fetcher import expiry_date
         raw_token = {
             'expires_at': datetime_to_float(timezone.now() - timedelta(hours=40))
         }
-        expires_actual = expiry_date(raw_token)
-        self.assertEqual(expires_actual, None)
+        expected_msg = "This means either parsing issue on our side or auth provider gone insane"
+        with six.assertRaisesRegex(self, ValueError, expected_msg):
+            expiry_date(raw_token)
 
     def test_raw_token_parsing_error(self):
         """
         When provider returns unparseable data (probably auth error), make
         sure we show an informative error message.
         """
-        from oauth2_client.tests.factories import ApplicationFactory
-        from oauth2_client.fetcher import Fetcher
         app = ApplicationFactory()
         fetcher = Fetcher(app)
         with LogCapture() as logs:
             with self.assertRaises(KeyError):
                 fetcher.access_token_from_raw_token({})
         self.assertIn("has changed specification", str(logs))
+
+    @data(TestToken("read write"), {"scope": "read write"})
+    @patch.object(Fetcher, 'requested_scope')
+    def test_different_scope_granted_object(self, token, mock_requested_scope):
+        """
+        Provider granted different scope than we requested.
+        Received the token as either object or a dict.
+        Ensure received scope is parsed properly and an useful warning is printed.
+        """
+        mock_requested_scope.return_value = ["read"]
+        fetcher = Fetcher(ApplicationFactory())
+        with LogCapture() as logs:
+            received_scope = fetcher.received_scope(token)
+            self.assertEqual(received_scope, "read write")
+            self.assertIn(
+                "Received different scope than requested. Requested: ['read'], received: ['read', 'write'].", str(logs)
+            )
