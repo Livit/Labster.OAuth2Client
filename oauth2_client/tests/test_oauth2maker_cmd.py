@@ -8,10 +8,6 @@ Using `tested_command.run_from_argv(...)` is not a good idea, as this would not
 test the entire django's invocation path. This command constitutes an important
 functionality of this package, so we want to use `call_command(...)` to invoke,
 as that exercises entire execution flow.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 import six
 from django.core.exceptions import ValidationError
@@ -94,7 +90,7 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         """
         Test validation: model provides required fields.
         """
-        from django.db import models
+        from .ide_test_compat import models
 
         class ModelWithoutFields(models.Model):
             class Meta:
@@ -112,8 +108,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         """
         Ensure Application gets created in the DB.
         """
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
-        from oauth2_client.models import Application
+        from .ide_test_compat import fake_app_name, fake_client_id, fake_client_secret, Application
+
         model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
@@ -146,8 +142,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         Ensure model validation works when creating an application.
         Creation should be aborted upon validation error.
         """
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id
-        from oauth2_client.models import Application
+        from .ide_test_compat import fake_app_name, fake_client_id, Application
+
         model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
@@ -172,8 +168,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         """
         Ensure we can't update a nonexistent application.
         """
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id
-        from oauth2_client.models import Application
+        from .ide_test_compat import fake_app_name, fake_client_id, Application
+
         model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
@@ -197,8 +193,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         """
         Ensure update functionality works fine.
         """
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
-        from oauth2_client.models import Application
+        from .ide_test_compat import fake_app_name, fake_client_id, fake_client_secret, Application
+
         model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()
@@ -259,8 +255,8 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         Check if update functionality validates the data in update mode.
         Update should be aborted on validation errors.
         """
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
-        from oauth2_client.models import Application
+        from .ide_test_compat import fake_app_name, fake_client_id, fake_client_secret, Application
+
         model_mock.return_value = Application
         app_name = fake_app_name()
         client_id = fake_client_id()

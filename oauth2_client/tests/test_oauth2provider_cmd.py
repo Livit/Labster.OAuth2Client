@@ -1,10 +1,6 @@
 """
 Test cases for `oauth2provider_app` django command. Most of the logic lives
 in the parent class and has separate tests, so this one is brief.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 
 from ddt import data, ddt, unpack
@@ -12,6 +8,7 @@ from django.core.management import call_command
 from faker import Factory
 from oauth2_provider.models import Application
 
+from oauth2_client.tests.factories import fake_app_name
 from test_case import StandaloneAppTestCase
 
 faker = Factory.create()
@@ -34,7 +31,6 @@ class TestOauth2ProviderAppCmd(StandaloneAppTestCase):
         """
         Test creating and updating various oauth applications with different parameters.
         """
-        from oauth2_client.tests.factories import fake_app_name
         app_name = fake_app_name()
         redirect_uri = faker.url()
         cmd_args = [

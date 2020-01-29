@@ -1,9 +1,5 @@
 """
 Test cases for `oauth2client_app` django command.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 
 from django.core.exceptions import ValidationError
@@ -26,8 +22,8 @@ class TestClientAppMakerCommand(StandaloneAppTestCase):
         Test creating various oauth applications with different parameters.
         Not using ddt here to be able to run this in IDE (model imports)
         """
-        from oauth2_client.models import Application
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
+        from .ide_test_compat import Application, fake_app_name, fake_client_id, fake_client_secret
+
         for grant_type in [grant[0] for grant in Application.GRANT_TYPES]:
             app_name = fake_app_name()
             service_host = faker.url()
@@ -63,8 +59,8 @@ class TestClientAppMakerCommand(StandaloneAppTestCase):
         """
         Make sure creating JWT_BEARER application fails, if no subject provided
         """
-        from oauth2_client.models import Application
-        from oauth2_client.tests.factories import fake_app_name, fake_client_id, fake_client_secret
+        from .ide_test_compat import Application, fake_app_name, fake_client_id, fake_client_secret
+
         app_name = fake_app_name()
         token_uri = faker.url()
         service_host = faker.url()

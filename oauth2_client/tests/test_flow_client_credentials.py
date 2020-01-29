@@ -1,11 +1,6 @@
 """
 Tests for Client Credentials Flow
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
-import os
 import time
 from datetime import timedelta
 
@@ -20,7 +15,6 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
     """
     Tests for Client Credentials Flow
     """
-    CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 
     @staticmethod
     def get_mocked_response_client_credentials_flow():
@@ -41,8 +35,7 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         Test client credentials flow (AKA backend flow).
         Scope is present in provider's response.
         """
-        from oauth2_client.fetcher import fetch_token
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import ApplicationFactory, fetch_token
 
         token_uri = 'http://this-is-fake.region.nip.io:8200/o/token/'
         app_data = {
@@ -77,8 +70,7 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """
         Test client credentials flow, no scope returned from the provider.
         """
-        from oauth2_client.fetcher import fetch_token
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import ApplicationFactory, fetch_token
 
         token_uri = 'http://this-is-fake.region.nip.io:8200/o/token/'
         app_data = {
@@ -113,8 +105,7 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """
         Test client credentials flow with `expires_at` returned
         """
-        from oauth2_client.fetcher import fetch_token
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import ApplicationFactory, fetch_token
 
         token_uri = 'http://this-is-fake.region.nip.io:8200/o/token/'
         app_data = {

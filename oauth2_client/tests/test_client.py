@@ -1,9 +1,5 @@
 """
 Client tests.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 from datetime import timedelta
 
@@ -28,9 +24,7 @@ class ClientTest(StandaloneAppTestCase):
         """
         Ensure new token is created if there is no token.
         """
-        from oauth2_client.client import get_client
-        from oauth2_client.models import AccessToken
-        from .factories import ApplicationFactory, fake_token
+        from .ide_test_compat import ApplicationFactory, AccessToken, fake_token, get_client
 
         now = timezone.now()
         app = ApplicationFactory()
@@ -47,10 +41,7 @@ class ClientTest(StandaloneAppTestCase):
         self.assertIsNotNone(tested_client)
         token_from_db = AccessToken.objects.get(application=app)
         self.assertEqual(token_from_provider.token, token_from_db.token)
-        self.assertEqual(
-            token_from_provider.expires,
-            token_from_db.expires
-        )
+        self.assertEqual(token_from_provider.expires, token_from_db.expires)
         fetch_token_mock.assert_called_once_with(app)
 
     @patch('oauth2_client.client.fetch_token')
@@ -58,9 +49,7 @@ class ClientTest(StandaloneAppTestCase):
         """
         Ensure no token is fetched if there is a valid one.
         """
-        from oauth2_client.models import AccessToken
-        from oauth2_client.client import get_client
-        from .factories import AccessTokenFactory, ApplicationFactory, fake_token
+        from .ide_test_compat import ApplicationFactory, AccessToken, AccessTokenFactory, fake_token, get_client
 
         now = timezone.now()
         app = ApplicationFactory()
@@ -75,10 +64,7 @@ class ClientTest(StandaloneAppTestCase):
         # ensure client uses new token now
         self.assertEqual(access_token.token, tested_client.token['access_token'])
         fetch_token_mock.assert_not_called()
-        self.assertFalse(
-            AccessToken.objects.filter(application=app)  # pylint: disable=maybe-no-member
-            .exclude(id=access_token.id).exists()
-        )
+        self.assertFalse(AccessToken.objects.filter(application=app) .exclude(id=access_token.id).exists())
 
     @patch('oauth2_client.client.fetch_token')
     @requests_mock.Mocker()
@@ -86,8 +72,8 @@ class ClientTest(StandaloneAppTestCase):
         """
         Given a valid token, ensure the client returns data
         """
-        from oauth2_client.client import get_client
-        from .factories import AccessTokenFactory, ApplicationFactory
+        from .ide_test_compat import ApplicationFactory, AccessTokenFactory, get_client
+
         api_url = 'https://some-api.com/api/hello'
         app = ApplicationFactory()
         access_token = AccessTokenFactory(
@@ -105,9 +91,7 @@ class ClientTest(StandaloneAppTestCase):
         """
         Ensure new token is fetched if the current one is expired
         """
-        from oauth2_client.client import get_client
-        from oauth2_client.models import AccessToken
-        from .factories import ApplicationFactory, AccessTokenFactory
+        from .ide_test_compat import ApplicationFactory, AccessTokenFactory, AccessToken, get_client
 
         now = timezone.now()
         app = ApplicationFactory()
@@ -144,9 +128,7 @@ class ClientTest(StandaloneAppTestCase):
         Expiration info is not mandated by the RFC, also Salesforce does not return this information.
         Make sure the token is attempted for use by the client.
         """
-        from oauth2_client.models import AccessToken
-        from oauth2_client.client import get_client
-        from .factories import ApplicationFactory, AccessTokenFactory
+        from .ide_test_compat import ApplicationFactory, AccessTokenFactory, AccessToken, get_client
 
         access_token = 'curr_token'
         app = ApplicationFactory()
@@ -172,8 +154,7 @@ class ClientTest(StandaloneAppTestCase):
         expiry. 403 is what `oauth2_provider` seems to be using.
         More about codes: https://stackoverflow.com/questions/30826726/how-to-identify-if-the-oauth-token-has-expired
         """
-        from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
-        from oauth2_client.client import OAuth2Client
+        from .ide_test_compat import ApplicationFactory, AccessTokenFactory, OAuth2Client
 
         api_url = 'https://some-api.com/api/hello'
         app = ApplicationFactory()
@@ -194,8 +175,7 @@ class ClientTest(StandaloneAppTestCase):
         Circuit breaker opens when two 4xx codes received in a row. 4xx status code
         is used as one of the ways of detecting token expiry.
         """
-        from oauth2_client.client import OAuth2Client
-        from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
+        from .ide_test_compat import ApplicationFactory, AccessTokenFactory, OAuth2Client
 
         api_url = 'https://some-api.com/api/hello'
         app = ApplicationFactory()

@@ -1,9 +1,5 @@
 """
 Tests for JWT Flow.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 import os
 from datetime import datetime
@@ -41,8 +37,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         """
         Test JWT Token Bearer flow fetches token
         """
-        from oauth2_client.fetcher import fetch_token
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import fetch_token, ApplicationFactory
 
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
@@ -67,7 +62,8 @@ class TestJWTFlow(StandaloneAppTestCase):
         Raise an exception when no subject specified. Subject is always required
         on the Application instance (in extra_settings['subject'])
         """
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import ApplicationFactory
+
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
         }
@@ -91,8 +87,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         """
         Test JWT Token Bearer flow. No scope returned from provider.
         """
-        from oauth2_client.fetcher import fetch_token
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import fetch_token, ApplicationFactory
 
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
@@ -115,8 +110,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         """
         Ensure the `audience` claim parameter is valid for prod SF URL
         """
-        from oauth2_client.tests.factories import ApplicationFactory
-        from oauth2_client.fetcher import JWTFetcher
+        from .ide_test_compat import ApplicationFactory, JWTFetcher
 
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
@@ -132,8 +126,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         """
         Ensure the `audience` claim parameter is valid for sandbox SF URL
         """
-        from oauth2_client.tests.factories import ApplicationFactory
-        from oauth2_client.fetcher import JWTFetcher
+        from .ide_test_compat import ApplicationFactory, JWTFetcher
 
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
@@ -152,8 +145,8 @@ class TestJWTFlow(StandaloneAppTestCase):
         server. Make sure it doesn't change unintentionally. The payload is a
         function of Application data, signing key, and current time.
         """
-        from oauth2_client.fetcher import JWTFetcher
-        from oauth2_client.tests.factories import ApplicationFactory
+        from .ide_test_compat import JWTFetcher, ApplicationFactory
+
         app_data = {
             'name': 'jwt_app',
             'authorization_grant_type': 'jwt-bearer',

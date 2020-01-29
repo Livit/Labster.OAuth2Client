@@ -1,9 +1,5 @@
 """
 Test cases for model-related functionality, that didn't fit anywhere else.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 from datetime import datetime, timedelta
 
@@ -23,7 +19,8 @@ class TestModel(StandaloneAppTestCase):
         Ensure AccessToken object gets transformed to a dict as expected by
         the `OAuth2Client`
         """
-        from oauth2_client.tests.factories import AccessTokenFactory, ApplicationFactory
+        from .ide_test_compat import AccessTokenFactory, ApplicationFactory
+
         now = datetime(1970, 1, 1, 0, 0, tzinfo=pytz.UTC)
         expiration_dt = now + timedelta(hours=1)  # expires 1h into epoch for easy testing
         app = ApplicationFactory()

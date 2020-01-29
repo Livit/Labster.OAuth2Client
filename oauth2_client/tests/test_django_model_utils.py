@@ -1,9 +1,5 @@
 """
 Test cases for django model utils.
-
-Local imports of model-related files are required for in-IDE test runs.
-Otherwise a model import is attempted before django.setup() call and
-an exception is thrown.
 """
 from random import randint
 
@@ -16,7 +12,7 @@ def test_model():
     Get model class for tests. Implemented as a function to avoid global
     model import.
     """
-    from django.db import models
+    from .ide_test_compat import models
 
     class SimpleModel(models.Model):
         class Meta:
