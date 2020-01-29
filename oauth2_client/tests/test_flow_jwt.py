@@ -33,7 +33,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         }""" % self.MOCK_ACCESS_TOKEN
 
     @requests_mock.Mocker()
-    def test_jwt_flow(self, m):
+    def test_jwt_flow(self, mock_request):
         """
         Test JWT Token Bearer flow fetches token
         """
@@ -46,14 +46,13 @@ class TestJWTFlow(StandaloneAppTestCase):
             'extra_settings': {'subject': 'xyz@abx.com.lightning'},
             'token_uri': 'https://test.salesforce.com/services/oauth2/token',
         }
-        app = ApplicationFactory(**app_data)
         # mock provider's response
-        m.post(
+        mock_request.post(
             "https://test.salesforce.com/services/oauth2/token",
             text=self.get_mocked_response_jwt_flow()
         )
 
-        actual_token = fetch_token(app)
+        actual_token = fetch_token(ApplicationFactory(**app_data))
         self.assertEqual(actual_token.token, self.MOCK_ACCESS_TOKEN)
         self.assertEqual(set(actual_token.scope.split()), {"web", "openid", "api", "id"})
         self.assertEqual(actual_token.token_type, "Bearer")
@@ -68,9 +67,8 @@ class TestJWTFlow(StandaloneAppTestCase):
         app_data = {
             'authorization_grant_type': 'jwt-bearer',
         }
-        app = ApplicationFactory(**app_data)
         with self.assertRaises(ValidationError):
-            app.clean()  # django's interface to trigger validation
+            ApplicationFactory(**app_data).clean()  # django's interface to trigger validation
 
     def get_mocked_response_jwt_flow_no_scope(self):
         """
@@ -84,7 +82,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         }""" % self.MOCK_ACCESS_TOKEN
 
     @requests_mock.Mocker()
-    def test_jwt_flow_no_scope(self, m):
+    def test_jwt_flow_no_scope(self, mock_request):
         """
         Test JWT Token Bearer flow. No scope returned from provider.
         """
@@ -97,14 +95,13 @@ class TestJWTFlow(StandaloneAppTestCase):
             'extra_settings': {'subject': 'xyz@abc.com.lightning'},
             'token_uri': 'https://test.salesforce.com/services/oauth2/token',
         }
-        app = ApplicationFactory(**app_data)
         # mock provider's response
-        m.post(
+        mock_request.post(
             "https://test.salesforce.com/services/oauth2/token",
             text=self.get_mocked_response_jwt_flow_no_scope()
         )
 
-        actual_token = fetch_token(app)
+        actual_token = fetch_token(ApplicationFactory(**app_data))
         self.assertEqual(actual_token.token, self.MOCK_ACCESS_TOKEN)
         self.assertFalse(actual_token.scope)
 
@@ -118,8 +115,7 @@ class TestJWTFlow(StandaloneAppTestCase):
             'authorization_grant_type': 'jwt-bearer',
             'token_uri': 'https://login.salesforce.com/services/oauth2/token',
         }
-        app = ApplicationFactory(**app_data)
-        fetcher = JWTFetcher(app)
+        fetcher = JWTFetcher(ApplicationFactory(**app_data))
         expected = 'https://login.salesforce.com'
         actual = fetcher._audience()
         self.assertEqual(expected, actual)
@@ -134,8 +130,7 @@ class TestJWTFlow(StandaloneAppTestCase):
             'authorization_grant_type': 'jwt-bearer',
             'token_uri': 'https://test.salesforce.com/services/oauth2/token',
         }
-        app = ApplicationFactory(**app_data)
-        fetcher = JWTFetcher(app)
+        fetcher = JWTFetcher(ApplicationFactory(**app_data))
         expected = 'https://test.salesforce.com'
         actual = fetcher._audience()
         self.assertEqual(expected, actual)
@@ -159,8 +154,7 @@ class TestJWTFlow(StandaloneAppTestCase):
         }
         # timezone only to silence a warning of enabled timezone support in django
         mocked_now.return_value = datetime(2020, 1, 1, tzinfo=timezone('GMT'))
-        app = ApplicationFactory(**app_data)
-        actual_payload = JWTFetcher(app).auth_payload()
+        actual_payload = JWTFetcher(ApplicationFactory(**app_data)).auth_payload()
         expected_payload = {
             'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
             'assertion': 'eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiAiZmFrZS5sb25nLmNsaWVudC5pZC5zdHJpbmciLCAi'

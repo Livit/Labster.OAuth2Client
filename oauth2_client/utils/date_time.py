@@ -6,11 +6,10 @@ from datetime import datetime
 import pytz
 
 
-def datetime_to_float(d):
+def datetime_to_float(dt):
     """
     Convert a datetime object to a floating point timestamp.
     Return a number of seconds elapsed from the UTC epoch.
-    Compatible with both Python 2 and 3.
 
     If the input object is timezone-aware, the result includes timezone
     difference between UTC and the timezone.
@@ -37,23 +36,22 @@ def datetime_to_float(d):
     See tests for more examples.
 
     Args:
-        d (datetime): timezone-aware or not
+        dt (datetime): timezone-aware or not
 
     Returns:
         float: e.g. 123456.123, always counting from UTC
     """
     epoch = datetime.fromtimestamp(0, tz=pytz.UTC)
-    if not d.tzinfo:
+    if not dt.tzinfo:
         epoch = epoch.replace(tzinfo=None)
 
-    total_seconds = (d - epoch).total_seconds()
+    total_seconds = (dt - epoch).total_seconds()
     return total_seconds
 
 
 def float_to_datetime(timestamp, tzinfo=None):
     """
     Convert a timestamp to a datetime instance.
-    Compatible with both Python 2 and 3.
 
     If tzinfo is passed, interpret the timestamp in the given timezone.
 

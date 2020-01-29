@@ -34,9 +34,7 @@ class FetcherTest(StandaloneAppTestCase):
         Ensure `expires` timestamp (on the token) in the past raises an exception.
         This means either parsing issues on our side, or auth provider gone insane.
         """
-        raw_token = {
-            'expires_at': datetime_to_float(timezone.now() - timedelta(hours=40))
-        }
+        raw_token = {'expires_at': datetime_to_float(timezone.now() - timedelta(hours=40))}
         expected_msg = "This means either parsing issue on our side or auth provider gone insane"
         with six.assertRaisesRegex(self, ValueError, expected_msg):
             expiry_date(raw_token)
@@ -46,8 +44,7 @@ class FetcherTest(StandaloneAppTestCase):
         When provider returns unparseable data (probably auth error), make
         sure we show an informative error message.
         """
-        app = ApplicationFactory()
-        fetcher = Fetcher(app)
+        fetcher = Fetcher(ApplicationFactory())
         with LogCapture() as logs:
             with self.assertRaises(KeyError):
                 fetcher.access_token_from_raw_token({})

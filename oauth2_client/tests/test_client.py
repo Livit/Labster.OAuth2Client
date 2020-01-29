@@ -76,9 +76,7 @@ class ClientTest(StandaloneAppTestCase):
 
         api_url = 'https://some-api.com/api/hello'
         app = ApplicationFactory()
-        access_token = AccessTokenFactory(
-            application=app,
-        )
+        access_token = AccessTokenFactory(application=app)
         fetch_token_mock.return_value = access_token
         mock_response.get(api_url, status_code=200, text='hello world!')
         tested_client = get_client(app.name)
@@ -132,10 +130,7 @@ class ClientTest(StandaloneAppTestCase):
 
         access_token = 'curr_token'
         app = ApplicationFactory()
-        AccessTokenFactory(
-            token=access_token,
-            application=app,
-        )
+        AccessTokenFactory(token=access_token, application=app)
 
         tested_client = get_client(app.name)
         self.assertEqual(tested_client.token['access_token'], access_token)
@@ -158,9 +153,7 @@ class ClientTest(StandaloneAppTestCase):
 
         api_url = 'https://some-api.com/api/hello'
         app = ApplicationFactory()
-        token = AccessTokenFactory(
-            application=app
-        )
+        token = AccessTokenFactory(application=app)
         mock_fetch_token.return_value = token
         tested_client = OAuth2Client(token)
         # MOCK: first response is bad, next token is refetched, second response is 200 OK
@@ -179,9 +172,7 @@ class ClientTest(StandaloneAppTestCase):
 
         api_url = 'https://some-api.com/api/hello'
         app = ApplicationFactory()
-        token = AccessTokenFactory(
-            application=app,
-        )
+        token = AccessTokenFactory(application=app)
         mock_fetch_token.return_value = token
         tested_client = OAuth2Client(token)
         # MOCK: first response is 403 forbidden, next token is successfully refetched,

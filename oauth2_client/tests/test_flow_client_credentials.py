@@ -30,7 +30,7 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """
 
     @requests_mock.Mocker()
-    def test_client_credentials_flow(self, m):
+    def test_client_credentials_flow(self, mock_request):
         """
         Test client credentials flow (AKA backend flow).
         Scope is present in provider's response.
@@ -43,11 +43,10 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
             'authorization_grant_type': 'client-credentials',
             'token_uri': token_uri,
         }
-        app = ApplicationFactory(**app_data)
         # mock provider's response
-        m.post(token_uri, text=self.get_mocked_response_client_credentials_flow())
+        mock_request.post(token_uri, text=self.get_mocked_response_client_credentials_flow())
 
-        actual_token = fetch_token(app)
+        actual_token = fetch_token(ApplicationFactory(**app_data))
         self.assertEqual(actual_token.token, "yajNXTGfIy2GevvYKgFDU2TDyy2913")
         token_expected_expires = tz.now() + timedelta(seconds=36000)
         self.assertAlmostEqual(actual_token.expires, token_expected_expires, delta=timedelta(seconds=1))
@@ -67,7 +66,7 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """
 
     @requests_mock.Mocker()
-    def test_client_credentials_flow_no_scope(self, m):
+    def test_client_credentials_flow_no_scope(self, mock_request):
         """
         Test client credentials flow, no scope returned from the provider.
         """
@@ -79,11 +78,10 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
             'authorization_grant_type': 'client-credentials',
             'token_uri': token_uri,
         }
-        app = ApplicationFactory(**app_data)
         # mock provider's response
-        m.post(token_uri, text=self.get_mocked_response_client_credentials_flow_no_scope())
+        mock_request.post(token_uri, text=self.get_mocked_response_client_credentials_flow_no_scope())
 
-        actual_token = fetch_token(app)
+        actual_token = fetch_token(ApplicationFactory(**app_data))
         self.assertEqual(actual_token.token, "yajNXTGfIy2GevvYKgFDU2TDyy2913")
         token_expected_expires = tz.now() + timedelta(seconds=36000)
         self.assertAlmostEqual(actual_token.expires, token_expected_expires, delta=timedelta(seconds=1))
@@ -103,7 +101,7 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
         """ % (time.time() + 200)
 
     @requests_mock.Mocker()
-    def test_client_credentials_flow_expires_at(self, m):
+    def test_client_credentials_flow_expires_at(self, mock_request):
         """
         Test client credentials flow with `expires_at` returned
         """
@@ -115,11 +113,10 @@ class ClientCredentialsFlowTest(StandaloneAppTestCase):
             'authorization_grant_type': 'client-credentials',
             'token_uri': token_uri,
         }
-        app = ApplicationFactory(**app_data)
         # mock provider's response
-        m.post(token_uri, text=self.get_mocked_response_client_credentials_flow_expires_at())
+        mock_request.post(token_uri, text=self.get_mocked_response_client_credentials_flow_expires_at())
 
-        actual_token = fetch_token(app)
+        actual_token = fetch_token(ApplicationFactory(**app_data))
         self.assertEqual(actual_token.token, "yajNXTGfIy2GevvYKgFDU2TDyy2913")
         token_expected_expires = tz.datetime.now(tz.utc) + timedelta(seconds=200)
         # bring to same timezone for comparison

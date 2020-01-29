@@ -19,9 +19,7 @@ def test_model():
             # random app_label prevents a warning saying that we register duplicated models
             app_label = 'test_app_{}'.format(randint(0, 100))
 
-        my_property = models.CharField(
-            help_text="good morning"
-        )
+        my_property = models.CharField(help_text="good morning")
         another_property = models.CharField()
     return SimpleModel
 

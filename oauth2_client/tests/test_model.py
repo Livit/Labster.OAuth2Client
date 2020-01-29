@@ -23,13 +23,12 @@ class TestModel(StandaloneAppTestCase):
 
         now = datetime(1970, 1, 1, 0, 0, tzinfo=pytz.UTC)
         expiration_dt = now + timedelta(hours=1)  # expires 1h into epoch for easy testing
-        app = ApplicationFactory()
         token = AccessTokenFactory(
             token="this-is-token",
             token_type="bearer",
             expires=expiration_dt,
             scope='read write',
-            application=app
+            application=ApplicationFactory()
         )
         with patch('oauth2_client.models.timezone.now', return_value=now):
             actual = token.to_client_dict()
