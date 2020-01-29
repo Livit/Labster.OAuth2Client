@@ -60,7 +60,7 @@ class OAuth2Client(OAuth2Session):
         but their solution works only for flows that issue a refresh_token. Both currently
         supported flows, JWT and Client Credentials don't provide the refresh_token, so we have
         to handle the refresh ourselves. (Client Credentials MAY issue refresh_token but it
-        doesn't in case of the `oauth2_provider` we use as a reference receiver).
+        doesn't in case of the `oauth2_provider` we use as a reference auth provider).
 
     Example:
         > # get OAuth2Client instance for the application

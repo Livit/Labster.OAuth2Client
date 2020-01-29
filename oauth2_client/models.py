@@ -21,44 +21,23 @@ class Application(models.Model):
         (GRANT_CLIENT_CREDENTIALS, "Client credentials"),
         (GRANT_JWT_BEARER, "JWT bearer"),
     )
-    name = models.CharField(
-        max_length=255,
-        unique=True,
-        help_text="Application name"
-    )
-    client_id = models.CharField(
-        max_length=100,
-        help_text="ID string of the application"
-    )
-    client_secret = models.CharField(
-        max_length=255,
-        help_text="Secret string of this application"
-    )
+    name = models.CharField(max_length=255, unique=True, help_text="Application name")
+    client_id = models.CharField(max_length=100, help_text="ID string of the application")
+    client_secret = models.CharField(max_length=255, help_text="Secret string of this application")
     authorization_grant_type = models.CharField(
-        max_length=32,
-        choices=GRANT_TYPES,
-        help_text="The type of authorization grant to be used"
+        max_length=32, choices=GRANT_TYPES, help_text="The type of authorization grant to be used"
     )
     # URLField isn't used because it doesn't accept docker-to-docker domains
     service_host = models.CharField(
-        max_length=200,
-        help_text="Service host. For example: http://service-a:8000 or https://serive-a.labster.com"
+        max_length=200, help_text="Service host. For example: http://service-a:8000 or https://serive-a.labster.com"
     )
-    token_uri = models.CharField(
-        max_length=200,
-        help_text="Token URL. For example: http://service-a:8000/o/token/"
-    )
+    token_uri = models.CharField(max_length=200, help_text="Token URL. For example: http://service-a:8000/o/token/")
     scope = models.CharField(
-        max_length=100,
-        blank=True,
-        default="",
-        help_text="Scope to be requested from provider, as a series of space delimited strings, "
-                  "e.g. `read write`"
+        max_length=100, blank=True, default="",
+        help_text="Scope to be requested from provider, as a series of space delimited strings, e.g. `read write`"
     )
     extra_settings = JSONField(
-        default=dict,
-        blank=True,
-        help_text="Custom settings JSON string. For data that didn't fit anywhere else"
+        default=dict, blank=True, help_text="Custom settings JSON string. For data that didn't fit anywhere else"
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -83,7 +62,6 @@ class Application(models.Model):
         Raises:
             ValidationError: 1) when subject not specified
         """
-        # noinspection PyUnresolvedReferences
         subject = self.extra_settings.get('subject')
         if self.authorization_grant_type == Application.GRANT_JWT_BEARER and not subject:
             msg = (
@@ -112,37 +90,19 @@ class AccessToken(models.Model):
     # This value is simply subtracted from token's `expiry` when checking validity.
     TIMEOUT_SECONDS = 60.0
 
-    token = models.CharField(
-        max_length=255,
-        unique=True,
-        help_text="The access_token as str"
-    )
+    token = models.CharField(max_length=255, unique=True, help_text="The access_token as str")
     raw_token = JSONField(
-        default=dict,
-        blank=True,
-        help_text="Token JSON object returned from provider. This is for debugging purposes and can"
-                  " be removed in the future."
+        default=dict, blank=True,
+        help_text="Token JSON object returned from provider. This is for debugging purposes and "
+                  "can be removed in the future."
     )
-    token_type = models.TextField(
-        help_text="Token type, most likely Bearer"
-    )
-    application = models.ForeignKey(
-        Application,
-        on_delete=models.CASCADE
-    )
-    expires = models.DateTimeField(
-        blank=True,
-        null=True
-    )
-
+    token_type = models.TextField(help_text="Token type, most likely Bearer")
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    expires = models.DateTimeField(blank=True, null=True)
     scope = models.TextField(
-        blank=True,
-        default="",
-        max_length=100,
-        help_text="Scope granted by provider, as a series of space delimited strings, "
-                  "e.g. `read write`"
+        blank=True, default="", max_length=100,
+        help_text="Scope granted by provider, as a series of space delimited strings, e.g. `read write`"
     )
-
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -156,7 +116,6 @@ class AccessToken(models.Model):
         Returns:
             bool: is token expired
         """
-        # noinspection PyTypeChecker
         if self.expires and timezone.now() >= self.expires - timedelta(seconds=self.TIMEOUT_SECONDS):
             return True
         return False

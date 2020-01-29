@@ -181,6 +181,8 @@ class JWTFetcher(Fetcher):
         Raises:
             ValidationError: if the Application object we are fetching token
                 for doesn't provide all required input data
+            RequestException: from `requests` library
+            JSONDecodeError: unparseable data received
         """
         self.app.validate_jwt_grant_data()
         payload = self.auth_payload()

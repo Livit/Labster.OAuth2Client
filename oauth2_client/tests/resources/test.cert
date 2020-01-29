@@ -13,3 +13,5 @@ hvcNAQELBQADgYEAihfi+Km+Pwcf78Y+aS6V15dUbK2xFyTcUw/QDwcJPvY+Mdgz
 5FV28ZGpWOkcX4DIuW3ETEUotT2D8bK38DcHUZBfqgyWtQv6CmgAc2i5J35yb260
 wiBxXMHJBGHaTCFNOJ8QYk5oVvorDbQiC6d9L45+bqmCCO97Aw47DMk/NXY=
 -----END CERTIFICATE-----
+
+# needed for oauth2_client/tests/test_flow_jwt.py and oauth2_client/tests/test_crypto.py
