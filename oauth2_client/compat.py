@@ -3,10 +3,10 @@ Support for python 2.7 and 3.x and for multiple versions of Django.
 """
 try:
     # python 3.x
-    from urllib.parse import urljoin
+    from urllib.parse import urljoin, urlsplit
 except ImportError:
     # python 2.7
-    from urlparse import urljoin
+    from urlparse import urljoin, urlsplit
 
 
 """

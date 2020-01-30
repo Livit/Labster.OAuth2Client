@@ -41,8 +41,8 @@ class TestLoggingCommand(StandaloneAppTestCase):
     @classmethod
     def tearDownClass(cls):
         super(TestLoggingCommand, cls).tearDownClass()
-        # Restore test logging to ERROR only. We want clean output.
-        logging.disable(logging.WARNING)
+        # Restore test logging to ERROR and WARNING only. We want clean output.
+        logging.disable(logging.INFO)
 
     def test_verbosity_error(self):
         """

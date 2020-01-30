@@ -1,10 +1,9 @@
 """
 Support for python 2.7 and 3.x
-
-To avoid install of test requirements in production.
 """
 try:
-    # python 3
-    from unittest.mock import patch
+    # python 3.x
+    from unittest.mock import Mock, patch
 except ImportError:
-    from mock import patch
+    # python 2.7
+    from mock import Mock, patch

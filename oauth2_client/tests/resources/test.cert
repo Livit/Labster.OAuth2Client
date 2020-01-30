@@ -1,0 +1,20 @@
+-----BEGIN CERTIFICATE-----
+MIICaDCCAdGgAwIBAgIUKrhJ2Rst69LwyhcKPMuhXEMAQ0owDQYJKoZIhvcNAQEL
+BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
+GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAgFw0xOTEyMDMwOTQ3MzRaGA8yMTE5
+MTEwOTA5NDczNFowRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUx
+ITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEA9sZppL2n0LOCMssFhCNtMz6kjJ+JSxY0OmRXGJCZiuau
+rGqfeEbmZAEBonFuLzrSxevlQFKrn3u3uvvdXS2s2MunuL/HN/I8tfkx2jfMCN9Y
+dro3WWvgBICQMX7+l2yYx3xDj0MWLQEBiYM3Z0VzeZ7pOj1QK25annRyoIorZMEC
+AwEAAaNTMFEwHQYDVR0OBBYEFD8fmlUpYQkqRPEwaIAdfc7fmsDcMB8GA1UdIwQY
+MBaAFD8fmlUpYQkqRPEwaIAdfc7fmsDcMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI
+hvcNAQELBQADgYEAihfi+Km+Pwcf78Y+aS6V15dUbK2xFyTcUw/QDwcJPvY+Mdgz
+5FV28ZGpWOkcX4DIuW3ETEUotT2D8bK38DcHUZBfqgyWtQv6CmgAc2i5J35yb260
+wiBxXMHJBGHaTCFNOJ8QYk5oVvorDbQiC6d9L45+bqmCCO97Aw47DMk/NXY=
+-----END CERTIFICATE-----
+
+# This certificate is not currently used anywhere in testing. However it constitutes
+# a pair with `test.key` from this directory. Think of this cert as a public key,
+# and `test.key` as a private key. Feel free to use it for testing at your convenience.
+# The pair was generated solely for test purposes and is not used for anything else.

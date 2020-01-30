@@ -1,8 +1,11 @@
+"""
+Django settings used for testing and development.
+"""
 import logging
 import os
 
-# log only errors in testing. We want clean output.
-logging.disable(logging.WARNING)
+# log only errors and warnings in testing. We want clean output.
+logging.disable(logging.INFO)
 
 # allow HTTP for OAuth in testing
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
