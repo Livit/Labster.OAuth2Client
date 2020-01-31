@@ -29,10 +29,11 @@ Python and Django compatibility is maintained in `compat.py` and `test_compat.py
 ### Installation
 -------------
 #### Extras
-As of version `0.2.0` this project provides two extras, `SF` and `providerApp`:
-- `SF` - enables Salesforce JWT grant type support
-- `providerApp` - enables `oauth2_provider.Application` creation by means of
-a `oauth2provider_app` Django management command
+As of version `0.2.0` this project provides two extras, `JWT_grant` and `oauth2provider_command`:
+- `JWT_grant` - enables JWT grant type support, used e.g. by Salesforce. See
+[RFC](https://tools.ietf.org/html/rfc7523)
+- `oauth2provider_command` - enables `oauth2_provider.Application` creation by means of
+an `oauth2provider_app` Django management command
 
 Vanilla install, without extras, makes you able to:
 - talk to systems that use `client-credentials` grant type
@@ -40,10 +41,10 @@ Vanilla install, without extras, makes you able to:
 #### Steps
 -----
 1. In requirements, add `git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0` or
-`git+ssh://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0#egg=oauth2-client[SF,providerApp]`,
+`git+ssh://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0#egg=oauth2-client[JWT_grant,oauth2provider_command]`,
 depending on if you need the extras
 
-2. Add "oauth2_client" to your INSTALLED_APPS settings. If you installed also `providerApp`
+2. Add "oauth2_client" to your INSTALLED_APPS settings. If you installed also `oauth2provider_command`
 extras, you have to add also `oauth2_provider`
 
 ```

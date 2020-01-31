@@ -41,11 +41,11 @@ setup(
         'retrying>=1.3.3',
     ],
     extras_require={
-        "providerApp": [
+        "oauth2provider_command": [
             'django-oauth-toolkit==1.0.0;python_version=="2.7"',
             'django-oauth-toolkit>=1.2.0;python_version>="3.7"',
         ],
-        "SF": [
+        "JWT_grant": [
             'cryptography>=2.8',
         ],
     }
