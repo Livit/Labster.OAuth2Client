@@ -18,7 +18,7 @@ Tested with a standard 3rd party `oauth2_provider` Django application from
 
 Supported Versions
 ------------------
-- Python 2.7 and Django 1.11,
+- Python 2.7 and Django 1.11
 - Python 3.7 and Django 2.2
 - PostgreSQL >= 9.6.9
 
