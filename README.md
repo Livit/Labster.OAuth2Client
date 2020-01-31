@@ -161,12 +161,3 @@ folder.
 #### Coverage
 If coverage is installed globally, it can take wrong version inside virtualenv,
 so better uninstall it.
-
-### Release History
--------------------
-#### 0.2.0
-- add JWT grant type support, enable communication with Salesforce
-- add `oauth2provider_app` and `oauth2client_app` Django management commands.
-For creating OAuth Application model instances on both Client and Provider sides
-- automate development environment setup
-- add requirements to `setup.py`
