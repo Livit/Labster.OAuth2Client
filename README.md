@@ -18,40 +18,58 @@ Tested with a standard 3rd party `oauth2_provider` Django application from
 
 Supported Versions
 ------------------
-Python 2.7 and Django 1.11,
-Python 3.7 and Django 2.2
+- Python 2.7 and Django 1.11,
+- Python 3.7 and Django 2.2
+- PostgreSQL >= 9.6.9
+
+Other versions may likely work too, but are not supported.
 
 Python and Django compatibility is maintained in `compat.py` and `test_compat.py`
 
-Quick Start
------------
+### Installation
+-------------
+#### Extras
+As of version `0.2.0` this project provides two extras, `SF` and `providerApp`:
+- `SF` - enables Salesforce JWT grant type support
+- `providerApp` - enables `oauth2_provider.Application` creation by means of
+a `oauth2provider_app` Django management command
 
-0. In requirements, add `pip install git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.1.3`
+Vanilla install, without extras, makes you able to:
+- talk to systems that use `client-credentials` grant type
 
-1. Add "oauth2_client" to your INSTALLED_APPS setting like this:
+#### Steps
+-----
+1. In requirements, add `git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0` or
+`git+ssh://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0#egg=oauth2-client[SF,providerApp]`,
+depending on if you need the extras
+
+2. Add "oauth2_client" to your INSTALLED_APPS settings. If you installed also `providerApp`
+extras, you have to add also `oauth2_provider`
 
 ```
     INSTALLED_APPS = [
         ...
+        'oauth2_provider',  # only for `providerApp` extras
         'oauth2_client',
     ]
 ```
 
-2. Run migrate to create the oauth2_client models.
+3. Run `python manage.py migrate` to create oauth2_client models.
 
-3. On the receiver side, create Application model and fill with proper data:
-
+4. On the receiver side, create Application model and fill with proper data, e.g.:
+```
     {
         name="Client name",
         redirect_uris="http://localhost",  # for local development
         client_type=Application.CLIENT_CONFIDENTIAL,
         authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS,
     }
+```
 
-4. On the client side, create oauth2_client.Application model instance, and
+5. On the client side, create `oauth2_client.Application` model instance, and
 populate it. You can get help by calling `python manage.py oauth2client_app -h`.
 
-5. Instantiate the client via library calls, and use it for all api calls.
+6. Instantiate the client via library calls, and use it for all api calls.
 
 
 Tests and Development
@@ -142,3 +160,12 @@ folder.
 #### Coverage
 If coverage is installed globally, it can take wrong version inside virtualenv,
 so better uninstall it.
+
+### Release History
+-------------------
+#### 0.2.0
+- add JWT grant type support, enable communication with Salesforce
+- add `oauth2provider_app` and `oauth2client_app` Django management commands.
+For creating OAuth Application model instances on both Client and Provider sides
+- automate development environment setup
+- add requirements to `setup.py`
