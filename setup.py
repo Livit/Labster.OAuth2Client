@@ -1,4 +1,5 @@
 import os
+
 from setuptools import find_packages, setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
@@ -27,8 +28,25 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
+    install_requires=[
+        'django>=1.11.17,<=1.11.24;python_version=="2.7"',
+        'django>=2.2;python_version>="3.7"',
+        'psycopg2 >= 2.7.3',
+        'pybreaker>=0.6.0',
+        'requests_oauthlib>=1.2.0',
+        'retrying>=1.3.3',
+    ],
+    extras_require={
+        "oauth2provider_command": [
+            'django-oauth-toolkit==1.0.0;python_version=="2.7"',
+            'django-oauth-toolkit>=1.2.0;python_version>="3.7"',
+        ],
+        "JWT_grant": [
+            'cryptography>=2.8',
+        ],
+    }
 )
