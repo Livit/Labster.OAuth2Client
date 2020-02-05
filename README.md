@@ -114,7 +114,7 @@ this is hardcoded to use python3
 - `make docker_setup`  # set up a venv for docker-compose
 - `make start && sleep 5`  # start a dockerized PostgreSQL instance
 - `source .venv/bin/activate`
-- `python test_manage.py test`
+- `python test_manage.py test tests`
 
 
 #### Migrations

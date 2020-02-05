@@ -9,8 +9,8 @@ from django.utils import timezone
 from testfixtures import LogCapture
 
 from oauth2_client.fetcher import Fetcher, expiry_date
-from oauth2_client.tests.factories import ApplicationFactory
-from oauth2_client.tests.test_compat import patch
+from tests.factories import ApplicationFactory
+from tests.test_compat import patch
 from oauth2_client.utils.date_time import datetime_to_float
 from test_case import StandaloneAppTestCase
 

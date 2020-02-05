@@ -35,4 +35,5 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'oauth2_provider',  # not needed in production, unless you need to create provider's Applications
     'oauth2_client',
+    'tests',  # https://docs.djangoproject.com/en/1.11/topics/testing/advanced/#testing-reusable-applications
 )

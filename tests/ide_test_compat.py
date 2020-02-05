@@ -8,6 +8,6 @@ from django.db import models
 from oauth2_client.client import get_client, OAuth2Client
 from oauth2_client.fetcher import Fetcher, JWTFetcher
 from oauth2_client.models import AccessToken, Application
-from oauth2_client.tests.factories import (
+from tests.factories import (
     ApplicationFactory, AccessTokenFactory, fake_client_secret, fake_token, fake_app_name, fake_client_id
 )

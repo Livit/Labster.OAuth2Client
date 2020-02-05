@@ -8,7 +8,7 @@ from django.core.management import call_command
 from faker import Factory
 from oauth2_provider.models import Application
 
-from oauth2_client.tests.factories import fake_app_name
+from tests.factories import fake_app_name
 from test_case import StandaloneAppTestCase
 
 faker = Factory.create()

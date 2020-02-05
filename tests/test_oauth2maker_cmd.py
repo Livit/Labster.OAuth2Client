@@ -16,7 +16,7 @@ from faker import Factory
 from testfixtures import LogCapture
 
 from oauth2_client.management.commands.oauth2_app_maker import Command as TestedCommand
-from oauth2_client.tests.test_compat import patch
+from tests.test_compat import patch
 from test_case import StandaloneAppTestCase
 
 faker = Factory.create()
