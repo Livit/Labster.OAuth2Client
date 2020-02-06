@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 import pytz
 
-from oauth2_client.tests.test_compat import patch
+from tests.test_compat import patch
 from test_case import StandaloneAppTestCase
 
 
