@@ -1,7 +1,7 @@
 """
 Create an instance of oauth2_provider's Application in DB, from CLI.
 """
-from oauth2_client.management.commands.oauth2_app_maker import Command as ParentCommand
+from oauth2_client.management.commands.oauth2_app_maker import Command as AbstractAppMaker
 
 try:
     from oauth2_provider.models import Application
@@ -10,11 +10,11 @@ except ImportError:
     Application = None
 
 
-class Command(ParentCommand):
+class Command(AbstractAppMaker):
     """
-    A command to create a new OAuth2 Application for oauth2_provider from CLI.
-    Model imports are local, to keep it possible to run the Client without
-    `oauth2_provider` package a
+    A command to create/update a new OAuth2 Application for oauth2_provider from CLI.
+    `--name` parameter is ensured to be present and unique, despite those constraints
+    not being defined on the provider's model.
 
     Usage examples:
     python ./manage.py oauth2provider_app -h  # this help message
@@ -25,11 +25,21 @@ class Command(ParentCommand):
         --authorization-grant-type  client-credentials \\
         --redirect-uris 'https://xyz.com/callback' \\
         --verbosity 2
+
+    python ./manage.py oauth2provider_app \\
+        --update \\
+        --name my_new_app \\
+        --redirect-uris 'https://xyz.com/new_callback' \\
+        --verbosity 2
+
+    python ./manage.py oauth2provider_app \\
+        --update \\
+        --name my_new_app \\
+        --redirect-uris ''  # empty strings allowed in update mode, to clear out a value
     """
     help = __doc__
 
-    @classmethod
-    def app_model(cls):
+    def app_model(self):
         """
         Application model type to be used
         """

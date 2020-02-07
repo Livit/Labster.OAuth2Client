@@ -6,10 +6,10 @@ in the parent class and has separate tests, so this one is brief.
 from ddt import data, ddt, unpack
 from django.core.management import call_command
 from faker import Factory
-from oauth2_provider.models import Application
 
-from tests.factories import fake_app_name
 from test_case import StandaloneAppTestCase
+from tests.factories import fake_app_name
+from tests.ide_test_compat import ProviderApplication
 
 faker = Factory.create()
 
@@ -21,10 +21,10 @@ class TestOauth2ProviderAppCmd(StandaloneAppTestCase):
     """
 
     @data(
-        (Application.CLIENT_PUBLIC, Application.GRANT_CLIENT_CREDENTIALS, False),
-        (Application.CLIENT_PUBLIC, Application.GRANT_CLIENT_CREDENTIALS, True),
-        (Application.CLIENT_CONFIDENTIAL, Application.GRANT_PASSWORD, True),
-        (Application.CLIENT_CONFIDENTIAL, Application.GRANT_PASSWORD, False),
+        (ProviderApplication.CLIENT_PUBLIC, ProviderApplication.GRANT_CLIENT_CREDENTIALS, False),
+        (ProviderApplication.CLIENT_PUBLIC, ProviderApplication.GRANT_CLIENT_CREDENTIALS, True),
+        (ProviderApplication.CLIENT_CONFIDENTIAL, ProviderApplication.GRANT_PASSWORD, True),
+        (ProviderApplication.CLIENT_CONFIDENTIAL, ProviderApplication.GRANT_PASSWORD, False),
     )
     @unpack
     def test_oauth2provider_app_command(self, client_type, grant_type, skip_auth):
@@ -46,7 +46,7 @@ class TestOauth2ProviderAppCmd(StandaloneAppTestCase):
 
         call_command(*cmd_args)
 
-        check_app = Application.objects.get(name=app_name)
+        check_app = ProviderApplication.objects.get(name=app_name)
         self.assertEqual(check_app.authorization_grant_type, grant_type)
         self.assertEqual(check_app.skip_authorization, skip_auth)
         self.assertEqual(check_app.client_type, client_type)

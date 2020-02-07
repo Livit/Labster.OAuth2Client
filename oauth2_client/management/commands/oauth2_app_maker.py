@@ -1,6 +1,6 @@
 """
 Abstract parent class for Django commands for
-creating/updating OAuth Application data records in database.
+creating/updating OAuth Application instances in database.
 """
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -11,34 +11,44 @@ from oauth2_client.utils.django.base_cmd import LoggingBaseCommand
 
 class Command(LoggingBaseCommand):
     """
+    This command is not usable unless you extend it.
+
     NOTE: by `Application` or `App` we mean an OAuth application and its representation in the
-        database, NOT a Django application.
-        See here: https://django-oauth-toolkit.readthedocs.io/en/latest/glossary.html#application
+    database, NOT a Django application.
+    See here: https://django-oauth-toolkit.readthedocs.io/en/latest/glossary.html#application
 
-    Abstract parent class for commands for creating OAuth2 Applications. Provides `create` and
+    _Abstract_ parent class for commands for creating OAuth2 Applications. Provides `create` and
     `update` logic. To extend, you have to provide the application model class to be used, and
-    input arguments.
+    input arguments. Requirements the model must meet are described in a section below.
 
-    Current descendants:
-        oauth2provider_app  - create/update Application on Provider side
-        oauth2client_app    - create/update Application on Client side
+    Validation:
+        This parent class performs model object validation before create/update. Basic validation
+        constraints are defined here, all non-trivial constraints are up to the model to define.
+        Constraints enforced in this class: application's `name` presence and uniqueness.
+        If validation not successful, a ValidationError is raised. Upon the error, create/update
+        is aborted, and no database changes are made.
 
-    See the extending classes for usage examples in CLI. Per default Django mechanism,
-    every Command provides also a `--help/-h` option.
+    On extending this command:
+        Current descendants:
+            oauth2provider_app  - create/update Application on Provider side
+            oauth2client_app    - create/update Application on Client side
 
-    Some conventions you need to follow when creating a new command for a new type of Application:
-    - make your new command extend OAuth2AppMaker
-    - `name` field on you model is mandatory and has to be unique
-    - `updated` DateTimeField on your model is mandatory
-    - please follow naming conventions of oauth2_provider.Application model class
-    - field names on your model have to match parameter names in the command. For example, if your
-      model has a field called `my_model.authorization_grant_type`, your command has to specify a
-      parameter named: '--authorization-grant-type' or 'authorization_grant_type'. This is because
-      both create and update dynamically map command arguments to model field names
+        See the extending classes for usage examples in CLI. Per default Django mechanism,
+        every Command provides also a `--help/-h` option.
+
+        Conventions you need to follow when creating a new command for a new type of Application:
+        - make your new command extend OAuth2AppMaker
+        - `name` CharField field on your model is mandatory
+        - `updated` DateTimeField on your model is mandatory
+        - please follow naming conventions of oauth2_provider.Application model class
+        - field names on your model have to match parameter names in the command. For example, if your
+          model has a field called `my_model.authorization_grant_type`, your command has to specify a
+          parameter named: '--authorization-grant-type' or 'authorization_grant_type'. This is because
+          both create and update dynamically map command arguments to model field names
     """
+    help = __doc__
 
-    @classmethod
-    def app_model(cls):
+    def app_model(self):
         """
         Specify model class to use.
 
@@ -178,7 +188,7 @@ class Command(LoggingBaseCommand):
                     setattr(app, key, target_val)
                     changed = True
             if changed:
-                app.full_clean(validate_unique=False)  # validation
+                app.full_clean(validate_unique=False)  # trigger validation
                 app.save()
             self.logger.info('Application %s successfully updated.', app_name)
         except (app_model.MultipleObjectsReturned, app_model.DoesNotExist) as e:
@@ -190,7 +200,8 @@ class Command(LoggingBaseCommand):
 
     def _create(self, application_data):
         """
-        Creates an application, if model validation successful.
+        Create an application, if model validation successful. Enforce unique name, even when
+        uniqueness not defined in the model.
 
         Args:
             application_data (dict): key-values for the new Application record
@@ -204,6 +215,23 @@ class Command(LoggingBaseCommand):
         """
         app_model = self.app_model()
         target_application = app_model(**application_data)
-        target_application.full_clean()  # validation
+        name_field = target_application._meta.get_field('name')
+        if not name_field.unique:
+            name_field.validators.append(self.validate_unique)
+        if name_field.blank:
+            name_field.blank = False  # do not allow blank app.name
+        target_application.full_clean()  # trigger validation
         target_application.save()
         self.logger.info('Application %s successfully created.', application_data['name'])
+
+    def validate_unique(self, name):
+        """
+        Validate Application.name uniqueness, before creating. Used for models,
+        that don't enforce that themselves.
+        """
+        count = self.app_model().objects.filter(name=name).count()
+        if count > 0:
+            raise ValidationError(
+                "Application already exists. Number of existing instances where name={}: {}. "
+                "`name` field has unique constraint.".format(name, count)
+            )
