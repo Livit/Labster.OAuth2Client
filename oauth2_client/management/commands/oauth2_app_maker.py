@@ -217,7 +217,7 @@ class Command(LoggingBaseCommand):
         target_application = app_model(**application_data)
         name_field = target_application._meta.get_field('name')
         if not name_field.unique:
-            name_field.validators.append(self.validate_unique)
+            name_field.validators.append(self.validate_unique)  # ensure name is unique
         if name_field.blank:
             name_field.blank = False  # do not allow blank app.name
         target_application.full_clean()  # trigger validation
@@ -228,10 +228,13 @@ class Command(LoggingBaseCommand):
         """
         Validate Application.name uniqueness, before creating. Used for models,
         that don't enforce that themselves.
+
+        Raises:
+            ValidationError:
         """
         count = self.app_model().objects.filter(name=name).count()
         if count > 0:
             raise ValidationError(
                 "Application already exists. Number of existing instances where name={}: {}. "
-                "`name` field has unique constraint.".format(name, count)
+                "`name` field has to be unique and present.".format(name, count)
             )
