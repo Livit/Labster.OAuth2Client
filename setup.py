@@ -37,12 +37,12 @@ setup(
         'django>=2.2;python_version>="3.7"',
         'psycopg2 >= 2.7.3',
         'pybreaker>=0.6.0',
-        'requests_oauthlib>=1.2.0',
+        'requests_oauthlib>=1.3.0',
         'retrying>=1.3.3',
     ],
     extras_require={
         "oauth2provider_command": [
-            'django-oauth-toolkit==1.0.0;python_version=="2.7"',
+            'django-oauth-toolkit==1.1.3;python_version=="2.7"',
             'django-oauth-toolkit>=1.2.0;python_version>="3.7"',
         ],
         "JWT_grant": [
