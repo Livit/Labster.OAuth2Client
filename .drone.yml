@@ -79,7 +79,6 @@ steps:
   pull: default
   image: dxa4481/trufflehog
   commands:
-  - ls -l
   - trufflehog --exclude_paths trufflehog-exclude.txt --regex .
   when:
     event:
