@@ -41,8 +41,3 @@ quality: pylint pycodestyle
 
 test: ## Run unit tests.
 		tox
-
-trufflehog: ## Run trufflehog secret leaks tool
-trufflehog:
-		./.venv/bin/trufflehog --exclude_paths trufflehog-exclude.txt --regex . && \
-		echo "All good"
