@@ -89,7 +89,7 @@ class TestOauth2AppMakerCmd(StandaloneAppTestCase):
         self.assertEqual(check_app.required_property, "hello")
         self.assertEqual(check_app.optional_property, "world")
         self.assertEqual(check_app.created, now)
-        self.assertIsNotNone(check_app.updated, now)
+        self.assertEqual(check_app.updated, now)
 
     @patch.object(TestedCommand, 'app_model')
     def test_create_validation(self, model_mock):

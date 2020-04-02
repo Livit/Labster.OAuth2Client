@@ -1,2 +1,1 @@
 tox==3.14.0
-truffleHog==2.0.99
