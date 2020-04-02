@@ -77,10 +77,8 @@ steps:
 
 - name: secrets leaks test
   pull: default
-  image: python:3.7.3-alpine3.8
+  image: dxa4481/trufflehog
   commands:
-  - apk --update add bash git
-  - pip install -r requirements/development.txt
   - trufflehog --exclude_paths trufflehog-exclude.txt --regex .
   when:
     event:
