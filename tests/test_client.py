@@ -29,7 +29,7 @@ class ClientTest(StandaloneAppTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(ClientTest, self).setUp()
         # ensure the circuit breaker is closed before running a test
         from oauth2_client.client import request_breaker
         request_breaker.close()
