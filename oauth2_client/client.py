@@ -86,21 +86,13 @@ class OAuth2Client(OAuth2Session):
         1) `oauth_provider`: check expiration datetime on the token itself. This is baked into
             the call to 3rd party's `super().request`. Other tokens are not guaranteed to contain
             this information.
-        2) Salesforce: interpret 4xx status code received as token expiry error. Based on discussion in
-            referenced thread.
-
-        Reference:
-            > Since different services can use different error codes for expired tokens,
-            > you can either keep track of the code for each service or an easy way to
-            > refresh tokens across services is to simply try a single refresh upon encountering
-            > a 4xx error.
-            Source: https://stackoverflow.com/questions/30826726/how-to-identify-if-the-oauth-token-has-expired
+        2) Salesforce: interpret 400 status code along with `invalid_grant` error as token expiry
 
         Raises:
             TokenExpiredError: upon token expiry detection
         """
         resp = super(OAuth2Client, self).request(method, url, *args, **kwargs)      # 1 oauth_provider
-        if 400 <= resp.status_code < 500:                                           # 2 salesforce
+        if is_invalid_jwt_grant(resp):                                              # 2 salesforce
             raise TokenExpiredError(description="4xx status code received. Assuming expired token.")
         return resp
 
@@ -177,3 +169,17 @@ def fetch_and_store_token(app):
     token.save()
     log.debug('Fetched and stored %s', token)
     return token
+
+
+def is_invalid_jwt_grant(resp):
+    """
+    Detect invalid OAuth 2.0 JWT token response returned from Salesforce
+
+    Reference:
+        https://help.salesforce.com/articleView?id=remoteaccess_oauth_flow_errors.htm&type=5
+    """
+    if resp.status_code == 400 \
+            and resp.headers.get('content-type') == 'application/json' \
+            and resp.json().get('error') == 'invalid_grant':
+        return True
+    return False
