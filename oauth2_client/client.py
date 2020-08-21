@@ -173,7 +173,7 @@ def fetch_and_store_token(app):
 
 def is_invalid_jwt_grant(resp):
     """
-    Detect invalid OAuth 2.0 JWT token response returned from Salesforce
+    Detect invalid OAuth 2.0 JWT token response returned from Salesforce (e.g. expired token)
 
     Reference:
         https://help.salesforce.com/articleView?id=remoteaccess_oauth_flow_errors.htm&type=5
