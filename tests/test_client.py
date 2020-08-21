@@ -13,7 +13,7 @@ from .test_compat import patch
 
 
 #
-# Response used by Salesforce to indicate invalid JWT grant
+# Response used by Salesforce to indicate invalid JWT grant (e.g. expired token)
 # https://help.salesforce.com/articleView?id=remoteaccess_oauth_flow_errors.htm
 #
 JWT_INVALID_RESP = {
