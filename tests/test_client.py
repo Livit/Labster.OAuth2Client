@@ -5,7 +5,6 @@ from datetime import timedelta
 
 import requests_mock
 import six
-from ddt import data, ddt
 from django.utils import timezone
 from pybreaker import CircuitBreakerError
 
@@ -13,11 +12,27 @@ from test_case import StandaloneAppTestCase
 from .test_compat import patch
 
 
-@ddt
+#
+# Response used by Salesforce to indicate invalid JWT grant (e.g. expired token)
+# https://help.salesforce.com/articleView?id=remoteaccess_oauth_flow_errors.htm
+#
+JWT_INVALID_RESP = {
+    'status_code': 400,
+    'headers': {'content-type': 'application/json'},
+    'json': {"error": "invalid_grant", "error_description": "This is not important"},
+}
+
+
 class ClientTest(StandaloneAppTestCase):
     """
     OAuth2 client test cases.
     """
+
+    def setUp(self):
+        super(ClientTest, self).setUp()
+        # ensure the circuit breaker is closed before running a test
+        from oauth2_client.client import request_breaker
+        request_breaker.close()
 
     @patch('oauth2_client.client.fetch_token')
     def test_no_token(self, fetch_token_mock):
@@ -141,13 +156,9 @@ class ClientTest(StandaloneAppTestCase):
 
     @patch('oauth2_client.client.fetch_and_store_token')
     @requests_mock.Mocker()
-    @data(401, 403)
-    def test_expired_token_refetched(self, bad_code, mock_fetch_token, mock_response):
+    def test_expired_jwt_token_refetched(self, mock_fetch_token, mock_response):
         """
-        Token expiry detection gets triggered by a bad status code.
-        Ensure token refetch is attempted. 401 is a common way to convey token
-        expiry. 403 is what `oauth2_provider` seems to be using.
-        More about codes: https://stackoverflow.com/questions/30826726/how-to-identify-if-the-oauth-token-has-expired
+        JWT token expiry detection gets triggered by a bad status code. Ensure token refetch is attempted.
         """
         from .ide_test_compat import ApplicationFactory, AccessTokenFactory, OAuth2Client
 
@@ -157,16 +168,16 @@ class ClientTest(StandaloneAppTestCase):
         mock_fetch_token.return_value = token
         tested_client = OAuth2Client(token)
         # MOCK: first response is bad, next token is refetched, second response is 200 OK
-        mock_response.get(api_url, [{'status_code': bad_code}, {'status_code': 200}])
+        mock_response.get(api_url, [JWT_INVALID_RESP, {'status_code': 200}])
         tested_client.get(api_url)
         mock_fetch_token.assert_called_once_with(app)
 
     @patch('oauth2_client.client.fetch_and_store_token')
     @requests_mock.Mocker()
-    def test_expired_tokens_break_circuit(self, mock_fetch_token, mock_response):
+    def test_expired_jwt_token_breaks_circuit(self, mock_fetch_token, mock_response):
         """
-        Circuit breaker opens when two 4xx codes received in a row. 4xx status code
-        is used as one of the ways of detecting token expiry.
+        Circuit breaker opens when two 400 codes received in a row. 400 status code
+        is used as one of the ways of detecting token expiry, for Salesforce JWT grant.
         """
         from .ide_test_compat import ApplicationFactory, AccessTokenFactory, OAuth2Client
 
@@ -175,9 +186,9 @@ class ClientTest(StandaloneAppTestCase):
         token = AccessTokenFactory(application=app)
         mock_fetch_token.return_value = token
         tested_client = OAuth2Client(token)
-        # MOCK: first response is 403 forbidden, next token is successfully refetched,
-        # but second response is 403 forbidden too. Circuit opens.
-        mock_response.get(api_url, [{'status_code': 403}, {'status_code': 403}])
+        # MOCK: first response is 400 with error msg, next token is successfully refetched,
+        # but second response is 400 with error too. Circuit opens.
+        mock_response.get(api_url, [JWT_INVALID_RESP, JWT_INVALID_RESP])
         with six.assertRaisesRegex(self, CircuitBreakerError, "Failures threshold reached"):
             tested_client.get(api_url)
         mock_fetch_token.assert_called_once_with(app)
