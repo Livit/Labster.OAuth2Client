@@ -11,10 +11,10 @@ class Migration(migrations.Migration):
         ('oauth2_client', '0001_initial'),
     ]
 
+    #
+    # This migration has been retrospectively cleared out, as it contained an
+    # operation that led to application.client_secret being truncated
+    # https://liv-it.atlassian.net/browse/TESLA-1469
+    #
     operations = [
-        migrations.AlterField(
-            model_name='application',
-            name='client_secret',
-            field=models.CharField(max_length=100),
-        ),
     ]
