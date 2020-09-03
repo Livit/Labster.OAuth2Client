@@ -41,9 +41,9 @@ Vanilla install, without extras, makes you able to:
 #### Steps
 -----
 1. Add installation URI in requirements. Choose URI schema that works best for your case. They differ in syntax, to keep pip and pip-compile happy:
-- no hashing and no extras: `git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0`
-- extras needed but no hashing required: `git+ssh://git@github.com/Livit/Labster.OAuth2Client.git@0.2.0#egg=oauth2-client[JWT_grant,oauth2provider_command]`
-- extras needed and `pip-compile --generate-hashes` required: `https://github.com/Livit/Labster.OAuth2Client/archive/v0.2.0.zip#egg=oauth2-client[JWT_grant,oauth2provider_command]`
+- no hashing and no extras: `git+https://git@github.com/Livit/Labster.OAuth2Client.git@0.2.3`
+- extras needed but no hashing required: `git+ssh://git@github.com/Livit/Labster.OAuth2Client.git@0.2.3#egg=oauth2-client[JWT_grant,oauth2provider_command]`
+- extras needed and `pip-compile --generate-hashes` required: `https://github.com/Livit/Labster.OAuth2Client/archive/v0.2.3.zip#egg=oauth2-client[JWT_grant,oauth2provider_command]`
 
 2. Add "oauth2_client" to your INSTALLED_APPS settings. If you installed also `oauth2provider_command`
 extras, you have to add also `oauth2_provider`
