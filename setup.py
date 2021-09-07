@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='oauth2-client',
-    version='0.2.3',
+    version='0.2.4',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -33,7 +33,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires=[
-        'django>=1.11.17,<=1.11.24;python_version=="2.7"',
+        'django>=1.11.17,<1.12;python_version=="2.7"',
         'django>=2.2;python_version>="3.7"',
         'psycopg2 >= 2.7.3',
         'pybreaker>=0.6.0',
