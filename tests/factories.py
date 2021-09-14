@@ -7,6 +7,8 @@ import random
 from factory.django import DjangoModelFactory
 from faker import Factory
 
+from oauth2_client.models import Application
+
 faker = Factory.create()
 
 
@@ -51,6 +53,7 @@ class ApplicationFactory(DjangoModelFactory):
     client_id = fake_client_id()
     client_secret = fake_client_secret()
     name = fake_app_name()
+    authorization_grant_type = Application.GRANT_CLIENT_CREDENTIALS
 
 
 class AccessTokenFactory(DjangoModelFactory):
