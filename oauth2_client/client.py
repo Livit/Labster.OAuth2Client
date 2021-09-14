@@ -91,9 +91,11 @@ class OAuth2Client(OAuth2Session):
         Raises:
             TokenExpiredError: upon token expiry detection
         """
-        resp = super(OAuth2Client, self).request(method, url, *args, **kwargs)      # 1 oauth_provider
-        if is_invalid_jwt_grant(resp):                                              # 2 salesforce
-            raise TokenExpiredError(description="4xx status code received. Assuming expired token.")
+        # 1 oauth_provider
+        resp = super(OAuth2Client, self).request(method, url, *args, **kwargs)
+        # 2 salesforce
+        if self.app.authorization_grant_type == Application.GRANT_JWT_BEARER and is_invalid_jwt_grant(resp):
+            raise TokenExpiredError(description="400 status code received in JWT flow. Assuming expired token.")
         return resp
 
     @request_breaker

@@ -8,6 +8,7 @@ import six
 from django.utils import timezone
 from pybreaker import CircuitBreakerError
 
+from oauth2_client.models import Application
 from test_case import StandaloneAppTestCase
 from .test_compat import patch
 
@@ -163,7 +164,7 @@ class ClientTest(StandaloneAppTestCase):
         from .ide_test_compat import ApplicationFactory, AccessTokenFactory, OAuth2Client
 
         api_url = 'https://some-api.com/api/hello'
-        app = ApplicationFactory()
+        app = ApplicationFactory(authorization_grant_type=Application.GRANT_JWT_BEARER)
         token = AccessTokenFactory(application=app)
         mock_fetch_token.return_value = token
         tested_client = OAuth2Client(token)
@@ -182,7 +183,7 @@ class ClientTest(StandaloneAppTestCase):
         from .ide_test_compat import ApplicationFactory, AccessTokenFactory, OAuth2Client
 
         api_url = 'https://some-api.com/api/hello'
-        app = ApplicationFactory()
+        app = ApplicationFactory(authorization_grant_type=Application.GRANT_JWT_BEARER)
         token = AccessTokenFactory(application=app)
         mock_fetch_token.return_value = token
         tested_client = OAuth2Client(token)
