@@ -44,6 +44,7 @@ setup(
         "oauth2provider_command": [
             'django-oauth-toolkit==1.1.3;python_version=="2.7"',
             'django-oauth-toolkit>=1.2.0;python_version>="3.7"',
+            'django-oauth-toolkit>=1.7.1;python_version>="3.10"',
         ],
         "JWT_grant": [
             'cryptography>=2.8',
