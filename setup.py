@@ -41,12 +41,11 @@ setup(
         'retrying>=1.3.3',
     ],
     extras_require={
-        "oauth2provider_command: python_version=='2.7': ['django-oauth-toolkit==1.1.3']",
-        "oauth2provider_command: python_version=='3.7': ['django-oauth-toolkit==1.2.0']",
-        "oauth2provider_command: python_version=='3.10': ['django-oauth-toolkit==1.7.1']",
+        'oauth2provider_command: python_version=="2.7"': ['django-oauth-toolkit==1.1.3'],
+        'oauth2provider_command: python_version=="3.7"': ['django-oauth-toolkit==1.2.0'],
+        'oauth2provider_command: python_version=="3.10"': ['django-oauth-toolkit==1.7.1'],
         "JWT_grant": [
             'cryptography>=2.8',
         ],
     }
 )
-
