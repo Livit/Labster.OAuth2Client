@@ -4,9 +4,9 @@ with `oauth2_provider's` ones, to ensure smooth interoperability.
 """
 from datetime import timedelta
 
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import JSONField
 from django.forms import model_to_dict
 from django.utils import timezone
 
