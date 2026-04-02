@@ -33,7 +33,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires=[
-        'django>=1.11.17,<1.12;python_version=="2.7"',
+        'django>=1.11.17,<2.3;python_version=="2.7"',
         'django>=2.2;python_version>="3.7"',
         'psycopg2 >= 2.7.3',
         'pybreaker>=0.6.0',
